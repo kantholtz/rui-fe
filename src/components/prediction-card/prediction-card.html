@@ -1,19 +1,16 @@
-<div class="grid">
+<div>
 
     <!-- Header -->
 
-    <header class="grid-candidate-header" />
-
-    <header class="grid-predictions-header">
+    <header>
         <b>{{ totalScoreNorm.toFixed(2) }}</b> ({{ totalScore.toFixed(2) }})
     </header>
 
     <!-- Candidate Text -->
 
-    <div class="grid-candidate">
+    <div>
         <template v-for="(token, i) of tokens">
-            <span class="token"
-                  :class="{marked: tokenSelections[i]}"
+            <span :class="{marked: tokenSelections[i]}"
                   @click="tokenSelections[i] = !tokenSelections[i]">
                 {{ token }}
             </span>
@@ -23,11 +20,10 @@
 
     <!-- Prediction Items -->
 
-    <div class="grid-predictions">
+    <div>
         <h1>Is Synonym of</h1>
-        <table v-if="candidateWithPredictions.synonymPredictions.length > 0"
-               class="mt-4">
-            <tr v-for="(synonymPrediction, index) of candidateWithPredictions.synonymPredictions" :key="index">
+        <table v-if="predictions.synonyms.length > 0">
+            <tr v-for="(synonymPrediction, index) of predictions.synonyms" :key="index">
                 <td :class="{selected: isPredictionSelected(PredictionType.SYNONYM, index)}"
                     @click="selectedPrediction = {type:PredictionType.SYNONYM, index}">
                     {{ synonymPrediction.scoreNorm.toFixed(2) }}
@@ -40,10 +36,9 @@
         </table>
         <span v-else>None</span>
 
-        <h1 class="mt-8">Is Child of</h1>
-        <table v-if="candidateWithPredictions.parentPredictions.length > 0"
-               class="mt-4">
-            <tr v-for="(parentPrediction, index) of candidateWithPredictions.parentPredictions" :key="index">
+        <h1 >Is Child of</h1>
+        <table v-if="predictions.children.length > 0">
+            <tr v-for="(parentPrediction, index) of predictions.children" :key="index">
                 <td :class="{selected: isPredictionSelected(PredictionType.CHILD, index)}"
                     @click="selectedPrediction = {type:PredictionType.CHILD, index}">
                     {{ parentPrediction.scoreNorm.toFixed(2) }}
@@ -59,13 +54,11 @@
 
     <!-- Footer -->
 
-    <footer class="grid-footer flex">
+    <footer>
         <button id="dismiss-button"
                 @click="$emit('dismiss')">
             Dismiss
         </button>
-
-        <div class="space"/>
 
         <input id="mention" ref="mention"
                type="text"

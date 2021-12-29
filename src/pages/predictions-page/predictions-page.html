@@ -1,48 +1,49 @@
-<LoadingOverlay :class="[showLoading ? 'd-initial' : 'd-none']"
-                :message="loadingMessages.join('\n')"/>
+<LoadingOverlay
+  :class="[showLoading ? 'block' : 'hidden']"
+  :message="loadingMessages.join('\n')"
+/>
 
-<main class="page-grid">
+<div class="container mx-auto center">
+  <main class="grid grid-cols-3 gap-4">
+    <section>
+      <ColHeader title="Related Symptoms" />
 
-    <!-- Predicted Node -->
-
-    <section class="grid-section grid-left">
-        <h1 class="grid-header">Predicted Node</h1>
-
-        <ul class="grid-content">
-            <TreeItem v-if="rootNode"
-                      :node="rootNode"
-                      :selectedNode="predictedNode"
-                      :selectable="false"/>
-        </ul>
+      <ul>
+        <TreeItem
+          v-if="rootNode"
+          :node="rootNode"
+          :selectedNode="predictedNode"
+          :selectable="false"
+        />
+      </ul>
     </section>
 
-    <!-- Predictions -->
+    <section>
+      <ColHeader title="Synonym Predictions" />
 
-    <section v-if="rootNode"
-             class="grid-section grid-top-right">
+      <PredictionCard
+        v-for="(Predictions, index) of predictions"
+        :key="predictions.candidate"
+        :predictions="Predictions"
+        :currentNodeId="predictedNode.id"
+        @dismiss="dismissPredictions(predictions.candidate)"
+        @createEntity="createEntityAndDismissPrediction(index, $event)"
+        @createNode="createNodeAndDismissPrediction(index, $event)"
+      >
+      </PredictionCard>
 
-        <h1 class="grid-header">Predictions</h1>
-
-        <!-- Predictions -->
-
-        <section class="grid-content">
-            <PredictionCard v-for="(candidateWithPredictions, index) of candidateWithPredictionsList"
-                            :key="candidateWithPredictions.candidate"
-                            class="prediction-card"
-                            :candidateWithPredictions="candidateWithPredictions"
-                            :currentNodeId="predictedNode.id"
-                            @dismiss="dismissCandidateWithPredictions(candidateWithPredictions.candidate)"
-                            @createEntity="createEntityAndDismissPrediction(index, $event)"
-                            @createNode="createNodeAndDismissPrediction(index, $event)">
-            </PredictionCard>
-        </section>
-
-        <!-- Pagination -->
-
-        <PaginationBar v-if="numberOfPages !== null"
-                       class="mx-auto"
-                       :numberOfPages="numberOfPages"
-                       @input="loadPredictions(nodeId, $event * 3, 3)">
-        </PaginationBar>
+      <PaginationBar
+        v-if="numberOfPages !== null"
+        :numberOfPages="numberOfPages"
+        @input="loadPredictions(nodeId, $event * 3, 3)"
+      >
+      </PaginationBar>
     </section>
-</main>
+
+    <section>
+      <ColHeader title="Child Predictions" />
+
+      TODO: separate prediction lists
+    </section>
+  </main>
+</div>

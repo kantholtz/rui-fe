@@ -1,43 +1,41 @@
-<li>
+<li class="pl-5 mb-2">
+  <!-- Clickable expand/collapse icon -->
 
-    <!-- Clickable expand/collapse icon -->
+  <ButtonKnob v-if="!expandable" label="•" kind="grey" />
 
-    <span v-if="!expandable"
-          class="marker cursor-default">
+  <ButtonKnob
+    v-if="expandable && !expanded"
+    label="+"
+    kind="sky"
+    @click="expanded = true"
+  />
 
-        •
-    </span>
+  <ButtonKnob
+    v-if="expandable && expanded"
+    label="-"
+    kind="orange"
+    @click="expanded = false"
+  />
 
-    <span v-if="expandable && !expanded"
-          class="marker cursor-pointer"
-          @click="expanded = true">
+  <!-- Node name -->
 
-        +
-    </span>
+  <a
+    :class="{'font-bold': node === selectedNode, selectable}"
+    @click="selectable && $emit('select', node)"
+  >
+    {{ getNodeName(node) }}
+  </a>
 
-    <span v-if="expandable && expanded"
-          class="marker cursor-pointer"
-          @click="expanded = false">
+  <!-- Child nodes & Input new child node-->
 
-        -
-    </span>
-
-    <!-- Node name -->
-
-    <span class="node-name"
-          :class="{selected: node === selectedNode, selectable}"
-          @click="selectable && $emit('select', node)">
-
-      {{ getNodeName(node) }}
-    </span>
-
-    <!-- Child nodes & Input new child node-->
-
-    <ul v-if="expanded">
-        <TreeItem v-for="(child, index) in node.children" :key="index"
-                  :node="child"
-                  :selectedNode="selectedNode"
-                  :selectable="selectable"
-                  @select="$emit('select', $event)"></TreeItem>
-    </ul>
+  <ul v-if="expanded" class="py-2">
+    <TreeItem
+      v-for="(child, index) in node.children"
+      :key="index"
+      :node="child"
+      :selectedNode="selectedNode"
+      :selectable="selectable"
+      @select="$emit('select', $event)"
+    ></TreeItem>
+  </ul>
 </li>

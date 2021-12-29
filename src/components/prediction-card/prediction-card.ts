@@ -1,193 +1,168 @@
-import {defineComponent, PropType} from 'vue'
+import { defineComponent, PropType } from "vue";
 
-import {AssertionError} from 'assert'
-import {CandidatePrediction} from '@/models/prediction/candidate-prediction'
-import {CandidateWithPredictions} from '@/models/prediction/candidate-with-predictions'
-import {PostEntity} from '@/models/entity/post-entity'
-import {PostNode} from '@/models/node/post-node'
-import {PredictionType} from '@/components/prediction-card/prediction-type'
-import {getNodeName} from '@/models/node/node'
+import { AssertionError } from "assert";
+import { Prediction } from "@/models/prediction/prediction";
+import { Predictions } from "@/models/prediction/predictions";
+import { PostEntity } from "@/models/entity/post-entity";
+import { PostNode } from "@/models/node/post-node";
+import { PredictionType } from "@/components/prediction-card/prediction-type";
+import { getNodeName } from "@/models/node/node";
 
 export default defineComponent({
+  data() {
+    return {
+      tokens: undefined as undefined | string[],
+      tokenSelections: undefined as undefined | boolean[],
 
-    computed: {
-        totalScore(): number {
-            const synonymPredictions = this.candidateWithPredictions.synonymPredictions
-            const childPredictions = this.candidateWithPredictions.parentPredictions
+      mentionInput: "",
 
-            if (synonymPredictions.length > 0 && childPredictions.length > 0) {
-                return (synonymPredictions[0].score + childPredictions[0].score) / 2
+      selectedPrediction: undefined as
+        | undefined
+        | {
+            type: PredictionType;
+            index: number;
+          },
 
-            } else if (synonymPredictions.length === 0) {
-                return childPredictions[0].score
+      getNodeName,
+      PredictionType,
+    };
+  },
 
-            } else if (childPredictions.length === 0) {
-                return synonymPredictions[0].score
-
-            } else {
-                throw new AssertionError({message: 'Should never be called'})
-            }
-        },
-
-        totalScoreNorm(): number {
-            const synonymPredictions = this.candidateWithPredictions.synonymPredictions
-            const childPredictions = this.candidateWithPredictions.parentPredictions
-
-            if (synonymPredictions.length > 0 && childPredictions.length > 0) {
-                return (synonymPredictions[0].scoreNorm + childPredictions[0].scoreNorm) / 2
-
-            } else if (synonymPredictions.length === 0) {
-                return childPredictions[0].scoreNorm
-
-            } else if (childPredictions.length === 0) {
-                return synonymPredictions[0].scoreNorm
-
-            } else {
-                throw new AssertionError({message: 'Should never be called'})
-            }
-        }
+  emits: {
+    dismiss() {
+      return true;
     },
 
-    data() {
-        return {
-            tokens: undefined as undefined | string[],
-            tokenSelections: undefined as undefined | boolean[],
-
-            mentionInput: '',
-
-            selectedPrediction: undefined as undefined | {
-                type: PredictionType,
-                index: number
-            },
-
-            getNodeName,
-            PredictionType
-        }
+    createEntity(postEntity: PostEntity) {
+      return true;
     },
 
-    emits: {
-        dismiss() {
-            return true
-        },
+    createNode(postNode: PostNode) {
+      return true;
+    },
+  },
 
-        createEntity(postEntity: PostEntity) {
-            return true
-        },
+  methods: {
+    /**
+     * Emit "createEntity" event if synonym prediction is selected or "createNode"
+     * event if child prediction is selected.
+     *
+     * Must only be called when a prediction is selected.
+     */
+    annotate() {
+      const selectedPrediction = this.selectedPrediction!;
 
-        createNode(postNode: PostNode) {
-            return true
-        }
+      const mentionInput = this.$refs.mention as HTMLInputElement;
+      const mention = mentionInput.value;
+
+      if (selectedPrediction.type === PredictionType.SYNONYM) {
+        const synonyms = this.predictions.synonyms;
+        const selectedSynonymPrediction: Prediction =
+          synonyms[selectedPrediction.index];
+        const selectedNode = selectedSynonymPrediction.node;
+
+        const postEntity: PostEntity = {
+          nodeId: selectedNode.id,
+          name: mention,
+        };
+
+        this.$emit("createEntity", postEntity);
+      } else if (selectedPrediction.type === PredictionType.CHILD) {
+        const children = this.predictions.children;
+        const selectedParentPrediction: Prediction =
+          children[selectedPrediction.index];
+        const selectedNode = selectedParentPrediction.node;
+
+        const postNode: PostNode = {
+          parentId: selectedNode.id,
+          entities: [{ name: mention }],
+        };
+
+        this.$emit("createNode", postNode);
+      }
     },
 
-    methods: {
+    isPredictionSelected(type: PredictionType, index: number): boolean {
+      const selectedPrediction = this.selectedPrediction!;
 
-        /**
-         * Emit "createEntity" event if synonym prediction is selected or "createNode"
-         * event if child prediction is selected.
-         *
-         * Must only be called when a prediction is selected.
-         */
-        annotate() {
-            const selectedPrediction = this.selectedPrediction!
+      return (
+        type === selectedPrediction.type && index === selectedPrediction.index
+      );
+    },
+  },
 
-            const mentionInput = this.$refs.mention as HTMLInputElement
-            const mention = mentionInput.value
+  name: "PredictionCard",
 
-            if (selectedPrediction.type === PredictionType.SYNONYM) {
-                const synonymPredictions = this.candidateWithPredictions.synonymPredictions
-                const selectedSynonymPrediction: CandidatePrediction = synonymPredictions[selectedPrediction.index]
-                const selectedNode = selectedSynonymPrediction.node
-
-                const postEntity: PostEntity = {
-                    nodeId: selectedNode.id,
-                    name: mention
-                }
-
-                this.$emit('createEntity', postEntity)
-
-            } else if (selectedPrediction.type === PredictionType.CHILD) {
-                const parentPredictions = this.candidateWithPredictions.parentPredictions
-                const selectedParentPrediction: CandidatePrediction = parentPredictions[selectedPrediction.index]
-                const selectedNode = selectedParentPrediction.node
-
-                const postNode: PostNode = {
-                    parentId: selectedNode.id,
-                    entities: [{name: mention}]
-                }
-
-                this.$emit('createNode', postNode)
-            }
-        },
-
-        isPredictionSelected(type: PredictionType, index: number): boolean {
-            const selectedPrediction = this.selectedPrediction!
-
-            return type === selectedPrediction.type && index === selectedPrediction.index
-        }
+  props: {
+    predictions: {
+      type: Object as PropType<Predictions>,
+      required: true,
     },
 
-    name: 'PredictionCard',
+    currentNodeId: {
+      type: Number,
+      required: true,
+    },
+  },
 
-    props: {
-        candidateWithPredictions: {
-            type: Object as PropType<CandidateWithPredictions>,
-            required: true
-        },
-
-        currentNodeId: {
-            type: Number,
-            required: true
-        }
+  watch: {
+    predictions: {
+      immediate: true,
+      handler(predictions: Predictions) {
+        this.tokens = predictions.candidate.split(" ");
+        this.tokenSelections = new Array<boolean>(this.tokens.length).fill(
+          false
+        );
+      },
     },
 
-    watch: {
-        candidateWithPredictions: {
-            immediate: true,
-            handler(candidateWithPredictions: CandidateWithPredictions) {
-                this.tokens = candidateWithPredictions.candidate.split(' ')
-                this.tokenSelections = new Array<boolean>(this.tokens.length).fill(false)
-            }
-        },
+    tokenSelections: {
+      deep: true,
+      handler(tokenSelections: boolean[]) {
+        const tokens = this.tokens!;
 
-        tokenSelections: {
-            deep: true,
-            handler(tokenSelections: boolean[]) {
-                const tokens = this.tokens!
+        this.mentionInput = tokenSelections
+          .map((tokenSelection, index) =>
+            tokenSelection ? tokens[index] : null
+          )
+          .filter((token) => token !== null)
+          .join(" ");
+      },
+    },
 
-                this.mentionInput = tokenSelections
-                    .map((tokenSelection, index) => tokenSelection ? tokens[index] : null)
-                    .filter(token => token !== null)
-                    .join(' ')
-            }
-        },
+    /**
+     * Select the synonym prediction for the current node. If there is none, select
+     * the child prediction for the current node. There must be one or both of these.
+     */
+    currentNodeId: {
+      immediate: true,
+      handler(currentNodeId: number) {
+        console.log("hello!");
+        console.log(this.predictions);
 
-        /**
-         * Select the synonym prediction for the current node. If there is none, select
-         * the child prediction for the current node. There must be one or both of these.
-         */
-        currentNodeId: {
-            immediate: true,
-            handler(currentNodeId: number) {
-                const synonymPredictions = this.candidateWithPredictions.synonymPredictions
-                for (let i = 0; i < synonymPredictions.length; i++) {
-                    const synonymPrediction = synonymPredictions[i]
-                    if (synonymPrediction.node.id === currentNodeId) {
-                        this.selectedPrediction = {type: PredictionType.SYNONYM, index: i}
-                        return
-                    }
-                }
-
-                const parentPredictions = this.candidateWithPredictions.parentPredictions
-                for (let i = 0; i < parentPredictions.length; i++) {
-                    const parentPrediction = parentPredictions[i]
-                    if (parentPrediction.node.id === currentNodeId) {
-                        this.selectedPrediction = {type: PredictionType.CHILD, index: i}
-                        return
-                    }
-                }
-
-                throw 'There is neither a synonym nor a parent prediction about the current node.'
-            }
+        const synonyms = this.predictions.synonyms;
+        for (let i = 0; i < synonyms.length; i++) {
+          const synonymPrediction = synonyms[i];
+          if (synonymPrediction.node.id === currentNodeId) {
+            this.selectedPrediction = {
+              type: PredictionType.SYNONYM,
+              index: i,
+            };
+            return;
+          }
         }
-    }
-})
+
+        const children = this.predictions.children;
+        for (let i = 0; i < children.length; i++) {
+          const parentPrediction = children[i];
+          if (parentPrediction.node.id === currentNodeId) {
+            this.selectedPrediction = { type: PredictionType.CHILD, index: i };
+            return;
+          }
+        }
+
+        throw "There is neither a synonym nor a parent prediction about the current node.";
+      },
+    },
+  },
+});

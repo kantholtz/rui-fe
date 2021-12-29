@@ -1,6 +1,5 @@
-import Header from '@/components/header/header.vue'
-import Footer from '@/components/footer/footer.vue'
+import Header from "@/components/header/header.vue";
 
 export default {
-    components: {Footer, Header}
-}
+  components: { Header },
+};

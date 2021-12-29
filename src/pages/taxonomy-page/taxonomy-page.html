@@ -1,49 +1,56 @@
-<LoadingOverlay :class="[showLoading ? 'd-initial' : 'd-none']"
-                :message="loadingMessages.join('\n')"/>
+<LoadingOverlay
+  :class="[showLoading ? 'block' : 'hidden']"
+  :message="loadingMessages.join('\n')"
+/>
 
-<main class="page-grid">
-
-    <!-- Taxonomy -->
-
-    <section class="grid-section grid-left">
-        <h1 class="grid-header">Taxonomy</h1>
-        <Taxonomy class="grid-content"
-                  :rootNodes="rootNodes"
-                  :selectedNode="selectedNode"
-                  @select="selectNode($event)"
-                  @createNode="showCreateRootNode"/>
+<div class="container mx-auto center">
+  <main class="grid grid-cols-3 gap-4">
+    <section>
+      <ColHeader title="Taxonomy" />
+      <Taxonomy
+        class="grid-content"
+        :rootNodes="rootNodes"
+        :selectedNode="selectedNode"
+        @select="selectNode($event)"
+        @createNode="showCreateRootNode"
+      />
     </section>
 
-    <section class="grid-section grid-top-right">
+    <section>
+      <!-- New Node -->
+      <ColHeader title="Node Details" />
 
-        <!-- New Node -->
+      <template v-if="!creatingNewNode && !selectedNode">
+        <p>Please select a symptom from the taxonomy.</p>
+      </template>
 
-        <template v-if="creatingNewNode">
-            <h1 class="grid-header">New Node</h1>
-            <NewNode class="grid-content"
-                     @createNode="createNode($event)"/>
-        </template>
+      <template v-if="creatingNewNode">
+        <h1>New Node</h1>
+        <NewNode class="grid-content" @createNode="createNode($event)" />
+      </template>
 
-        <!-- Node Details -->
+      <!-- Node Details -->
 
-        <template v-if="!creatingNewNode && selectedNode">
-            <h1 class="grid-header">Node Details</h1>
-            <NodeDetails class="grid-content"
-                         :node="selectedNode"
-                         @createEntity="createEntity($event)"
-                         @deleteEntity="deleteEntity($event)"
-                         @createNode="showCreateNode"
-                         @deleteNode="deleteNode($event)"/>
-        </template>
+      <template v-if="!creatingNewNode && selectedNode">
+        <h1>Node Details</h1>
+        <NodeDetails
+          class="grid-content"
+          :node="selectedNode"
+          @createEntity="createEntity($event)"
+          @deleteEntity="deleteEntity($event)"
+          @createNode="showCreateNode"
+          @deleteNode="deleteNode($event)"
+        />
+      </template>
     </section>
 
-    <!-- Matches -->
-
-    <section class="grid-section grid-bottom-right">
-        <template v-if="selectedNode">
-            <h1 class="grid-header">Matches</h1>
-            <Matches class="grid-content"
-                     :node="selectedNode"/>
-        </template>
+    <section>
+      <template v-if="selectedNode">
+        <ColHeader title="Already Matched Texts" />
+        <Matches class="grid-content" :node="selectedNode" />
+      </template>
     </section>
-</main>
+  </main>
+</div>
+
+<main></main>

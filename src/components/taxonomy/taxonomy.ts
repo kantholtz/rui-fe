@@ -1,29 +1,30 @@
-import {defineComponent, PropType} from 'vue'
+import { defineComponent, PropType } from "vue";
 
-import TreeItem from '@/components/tree-item/tree-item.vue'
-import {DeepNode} from '@/models/node/deep-node'
+import TreeItem from "@/components/tree-item/tree-item.vue";
+import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
+import { DeepNode } from "@/models/node/deep-node";
 
 export default defineComponent({
-    name: 'Taxonomy',
+  name: "Taxonomy",
 
-    components: {TreeItem},
+  components: { TreeItem, ButtonRegular },
 
-    props: {
-        rootNodes: {
-            type: Array as PropType<Array<DeepNode>>,
-            required: true
-        },
-
-        selectedNode: Object as PropType<DeepNode>
+  props: {
+    rootNodes: {
+      type: Array as PropType<Array<DeepNode>>,
+      required: true,
     },
 
-    emits: {
-        select(node: DeepNode) {
-            return true
-        },
+    selectedNode: Object as PropType<DeepNode>,
+  },
 
-        createNode() {
-            return true
-        }
-    }
-})
+  emits: {
+    select(node: DeepNode) {
+      return true;
+    },
+
+    createNode() {
+      return true;
+    },
+  },
+});

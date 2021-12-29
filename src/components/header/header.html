@@ -1,19 +1,30 @@
-<header>
+<header class="grid grid-cols-3 bg-white border-b border-gray-300 p-5">
+  <div
+    @click="goToHomePage()"
+    class="flex flex-row space-x-2 text-xl font-serif text-left"
+  >
+    <h1 class="tracking-widest pr-1">RUI</h1>
+    <h2 class="text-gray-300 border-l border-gray-300 pl-3">
+      <div>version 1.0</div>
+      <div>symptax.v7</div>
+    </h2>
+  </div>
 
-    <div class="title"
-         @click="goToHomePage()">
+  <nav class="flex justify-center">
+    <router-link to="/upload" class="text-xl text-lavis-red-500 bold p-5"
+      >Upload</router-link
+    >
+    <router-link to="/taxonomy" class="text-xl text-lavis-red-500 bold p-5"
+      >Taxonomy</router-link
+    >
+  </nav>
 
-        <h1>RUI</h1>
-        <h2>Hunting<br/>Entities</h2>
-    </div>
-
-    <nav>
-        <router-link to="/upload">Upload</router-link>
-        <router-link to="/taxonomy">Taxonomy</router-link>
-    </nav>
-
-    <div class="logo">
-        <img src="@/assets/images/logo-lavis.svg" alt="LAVIS Logo">
-    </div>
-
+  <div class="flex justify-end">
+    <img class="h-14" alt="LAVIS Logo" src="@/assets/images/logo-lavis.svg" />
+    <img
+      class="h-10 mt-4 ml-10"
+      alt="LAVIS Logo"
+      src="@/assets/images/logo-empolis.png"
+    />
+  </div>
 </header>

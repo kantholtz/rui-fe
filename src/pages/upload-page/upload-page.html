@@ -1,7 +1,7 @@
-<LoadingOverlay :class="[showLoading ? 'd-initial' : 'd-none']"
+<LoadingOverlay :class="[showLoading ? 'block' : 'hidden']"
                 :message="loadingMessages.join('\n')"/>
 
-<UploadWarning :class="[showUploadWarning ? 'd-initial' : 'd-none']"
+<UploadWarning :class="[showUploadWarning ? 'block' : 'hidden']"
                @cancel="showUploadWarning = false"
                @overwrite="uploadAndRedirect"/>
 
