@@ -1,11 +1,11 @@
-import {defineComponent} from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-    name: 'Header',
+  name: "HeaderBar",
 
-    methods: {
-        goToHomePage() {
-            this.$router.push('/').then()
-        }
-    }
-})
+  methods: {
+    goToHomePage() {
+      this.$router.push("/").then();
+    },
+  },
+});

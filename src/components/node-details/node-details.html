@@ -1,93 +1,81 @@
 <div v-if="node">
+  <!-- predictions -->
 
-    <main>
+  <div class="p-5 mb-5 bg-white rounded-lg">
+    <ButtonRegular
+      label="Show Predictions"
+      kind="sky"
+      class="mb-5 inline-block"
+      @click="$router.push(`/predictions/${node.id}`)"
+    />
 
-        <!-- Entities -->
+    <div class="grid grid-cols-3 gap-x-5">
+      <div class="font-bold">Synonyms</div>
+      <div class="col-span-2">
+        {{ synonymPredictions === null ? '...' : synonymPredictions }}
+      </div>
 
-        <h1>Entities ({{ node.entities.length }})</h1>
-        <section>
-            <ul>
-                <li v-for="entity of node.entities" :key="entity.id">
-                    {{ entity.name }}
+      <div class="font-bold">Children</div>
+      <div class="col-span-2">
+        {{ childPredictions === null ? '...' : childPredictions }}
+      </div>
+    </div>
+  </div>
 
-                    <span class="matches-count">
-                        ({{ entity.matchesCount }}&nbsp;{{ entity.matchesCount === 1 ? 'match' : 'matches' }})
-                    </span>
+  <!-- entities -->
 
-                    <button class="delete-button" @click="deleteEntity(entity.id)">
-                        Delete
-                    </button>
-                </li>
+  <div class="p-5 mb-5 bg-white rounded-lg">
+    <h3 class="text-lg mb-3">Phrases ({{ node.entities.length }})</h3>
+    <ul class="pl-5 mb-5">
+      <li v-for="entity of node.entities" :key="entity.id" class="mb-2">
+        <ButtonKnob @click="deleteEntity(entity.id)" kind="pink" label="x" />
 
-                <li>
-                    <input style="display: inline" @change="createEntity($event)"
-                           placeholder="New Entity"
+        {{ entity.name }}
 
-                    /> <button class="create-button d-inline-block"
-                               @click="createEntity(entity.id)">
-                    Add
-                </button>
-                </li>
-            </ul>
-        </section>
+        <span class="text-gray-400">
+          ({{ entity.matchesCount }}&nbsp;{{ entity.matchesCount === 1 ? 'match'
+          : 'matches' }})
+        </span>
+      </li>
+    </ul>
 
-        <!-- Matches -->
+    <input
+      class="border border-gray-500 mr-5 p-2"
+      @change="createEntity($event)"
+      placeholder="New Entity"
+    />
 
-        <h1>Matches</h1>
-        <section>
-            <table>
-                <tr>
-                    <th>Direct</th>
-                    <td>{{ shallowNodeMatches }}</td>
-                </tr>
-                <tr>
-                    <th>Children</th>
-                    <td>{{ deepNodeMatches - shallowNodeMatches }}</td>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td class="total">
-                        {{ deepNodeMatches }}
-                    </td>
-                </tr>
-            </table>
-        </section>
+    <ButtonRegular label="Add" kind="sky" @click="createEntity(entity.id)" />
+  </div>
 
-        <!-- Predictions -->
+  <!-- matches -->
 
-        <h1>Predictions</h1>
-        <section class="predictions">
-            <table>
-                <tr>
-                    <th>Synonyms</th>
-                    <td>{{ synonymPredictions === null ? '...' : synonymPredictions }}</td>
-                </tr>
-                <tr>
-                    <th>Children</th>
-                    <td>{{ childPredictions === null ? '...' : childPredictions }}</td>
-                </tr>
-            </table>
+  <div class="p-5 mb-5 bg-white rounded-lg">
+    <h3 class="text-lg mb-3">Associated Texts</h3>
 
-            <button class="mt-8 navigate-button"
-                    @click="$router.push(`/predictions/${node.id}`)">
-                Show Predictions
-            </button>
-        </section>
+    <div class="grid grid-cols-3 gap-x-5 pl-5">
+      <div class="font-bold">Direct</div>
+      <div class="col-span-2">{{ shallowNodeMatches }}</div>
 
-        <!-- Node Buttons -->
+      <div class="font-bold">Children</div>
+      <div class="col-span-2">{{ deepNodeMatches - shallowNodeMatches }}</div>
 
-        <h1>Topology</h1>
-        <section>
-            <button class="delete-button"
-                    @click="$emit('deleteNode', node)">
-                Delete Node
-            </button>
+      <div class="font-bold">Total</div>
+      <div class="col-span-2">{{ deepNodeMatches }}</div>
+    </div>
+  </div>
 
-            <button class="create-button ml-8"
-                    @click="$emit('createNode', node)">
-                Add Child Node
-            </button>
-        </section>
-    </main>
-
+  <div class="p-5 mb-5 bg-white rounded-lg">
+    <ButtonRegular
+      label="Add Child Node"
+      kind="sky"
+      class="mr-5"
+      @click="$emit('createNode', node)"
+    />
+    <ButtonRegular
+      label="Delete Node"
+      kind="pink"
+      @click="$emit('deleteNode', node)"
+    />
+  </div>
 </div>

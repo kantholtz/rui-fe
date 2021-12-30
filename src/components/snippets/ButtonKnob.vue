@@ -1,6 +1,6 @@
 <template>
   <span
-    class="inline-block text-center w-6 h-6 mr-2 pb-1 rounded-lg transition-colors duration-150"
+    class="inline-block text-center w-6 h-6 mr-2 align-middle rounded-lg transition-colors duration-300"
     :class="classes"
   >
     {{ label }}
@@ -30,6 +30,12 @@ export default defineComponent({
           "bg-orange-300",
           "text-orange-100",
           "hover:bg-orange-600",
+          "hover:text-white",
+        ],
+        pink: [
+          "bg-pink-600",
+          "text-pink-100",
+          "hover:bg-pink-800",
           "hover:text-white",
         ],
       };

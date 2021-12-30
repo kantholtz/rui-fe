@@ -1,122 +1,134 @@
-import {defineComponent, PropType} from 'vue'
+import { defineComponent, PropType } from "vue";
 
-import {DeepNode} from '@/models/node/deep-node'
-import {Entity} from '@/models/entity/entity'
-import {PostEntity} from '@/models/entity/post-entity'
-import {PredictionResponse} from "@/models/prediction/prediction-response";
-import {PredictionService} from "@/services/prediction-service";
+import { DeepNode } from "@/models/node/deep-node";
+import { Entity } from "@/models/entity/entity";
+import { PostEntity } from "@/models/entity/post-entity";
+import { PredictionResponse } from "@/models/prediction/prediction-response";
+import { PredictionService } from "@/services/prediction-service";
+
+import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
+import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
 
 export default defineComponent({
-    name: 'NodeDetails',
+  name: "NodeDetails",
+  components: { ButtonKnob, ButtonRegular },
 
-    props: {
-        node: Object as PropType<DeepNode>
+  props: {
+    node: Object as PropType<DeepNode>,
+  },
+
+  watch: {
+    node: {
+      immediate: true,
+      handler(node: DeepNode) {
+        this.resetNodeData();
+
+        const { shallowNodeMatches, deepNodeMatches } = this.countMatches(node);
+
+        this.shallowNodeMatches = shallowNodeMatches;
+        this.deepNodeMatches = deepNodeMatches;
+
+        this.countPredictions(node);
+      },
+    },
+  },
+
+  emits: {
+    createNode(parent: DeepNode) {
+      return true;
     },
 
-    watch: {
-        node: {
-            immediate: true,
-            handler(node: DeepNode) {
-                this.resetNodeData()
-
-                const {shallowNodeMatches, deepNodeMatches} = this.countMatches(node)
-
-                this.shallowNodeMatches = shallowNodeMatches
-                this.deepNodeMatches = deepNodeMatches
-
-                this.countPredictions(node)
-            }
-        }
+    deleteNode(node: DeepNode) {
+      return true;
     },
 
-    emits: {
-        createNode(parent: DeepNode) {
-            return true
-        },
-
-        deleteNode(node: DeepNode) {
-            return true
-        },
-
-        createEntity(postEntity: PostEntity) {
-            return true
-        },
-
-        deleteEntity(entityId: number) {
-            return true
-        }
+    createEntity(postEntity: PostEntity) {
+      return true;
     },
 
-    data() {
-        return {
-            shallowNodeMatches: null as number | null,
-            deepNodeMatches: null as number | null,
+    deleteEntity(entityId: number) {
+      return true;
+    },
+  },
 
-            synonymPredictions: null as number | null,
-            childPredictions: null as number | null
-        }
+  data() {
+    return {
+      shallowNodeMatches: null as number | null,
+      deepNodeMatches: null as number | null,
+
+      synonymPredictions: null as number | null,
+      childPredictions: null as number | null,
+    };
+  },
+
+  methods: {
+    resetNodeData() {
+      this.shallowNodeMatches = null;
+      this.deepNodeMatches = null;
+
+      this.synonymPredictions = null;
+      this.childPredictions = null;
     },
 
-    methods: {
-        resetNodeData() {
-            this.shallowNodeMatches = null
-            this.deepNodeMatches = null
+    createEntity(event: Event) {
+      const node = this.node!;
 
-            this.synonymPredictions = null
-            this.childPredictions = null
-        },
+      const input = event.target as HTMLInputElement;
 
-        createEntity(event: Event) {
-            const node = this.node!
+      const postEntity: PostEntity = {
+        nodeId: node.id,
+        name: input.value,
+      };
 
-            const input = event.target as HTMLInputElement
+      this.$emit("createEntity", postEntity);
 
-            const postEntity: PostEntity = {
-                nodeId: node.id,
-                name: input.value
-            }
+      input.value = "";
+    },
 
-            this.$emit('createEntity', postEntity)
+    deleteEntity(entityId: number): void {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const node = this.node!;
 
-            input.value = ''
-        },
+      if (node.entities.length > 1) {
+        this.$emit("deleteEntity", entityId);
+      }
+    },
 
-        deleteEntity(entityId: number): void {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const node = this.node!
+    countMatches(node: DeepNode): {
+      shallowNodeMatches: number;
+      deepNodeMatches: number;
+    } {
+      const shallowNodeMatches = this.countShallowNodeMatches(node);
+      const deepNodeMatches = this.countDeepNodeMatches(node);
 
-            if (node.entities.length > 1) {
-                this.$emit('deleteEntity', entityId)
-            }
-        },
+      return { shallowNodeMatches, deepNodeMatches };
+    },
 
-        countMatches(node: DeepNode): { shallowNodeMatches: number, deepNodeMatches: number } {
-            const shallowNodeMatches = this.countShallowNodeMatches(node)
-            const deepNodeMatches = this.countDeepNodeMatches(node)
+    countShallowNodeMatches(node: DeepNode): number {
+      return node.entities.reduce(
+        (nodeMatches: number, entity: Entity) =>
+          nodeMatches + entity.matchesCount,
+        0
+      );
+    },
 
-            return {shallowNodeMatches, deepNodeMatches}
-        },
+    countDeepNodeMatches(node: DeepNode): number {
+      let deepMatches = this.countShallowNodeMatches(node);
 
-        countShallowNodeMatches(node: DeepNode): number {
-            return node.entities.reduce((nodeMatches: number, entity: Entity) =>
-                nodeMatches + entity.matchesCount, 0)
-        },
+      for (const child of node.children) {
+        deepMatches += this.countDeepNodeMatches(child);
+      }
 
-        countDeepNodeMatches(node: DeepNode): number {
-            let deepMatches = this.countShallowNodeMatches(node)
+      return deepMatches;
+    },
 
-            for (const child of node.children) {
-                deepMatches += this.countDeepNodeMatches(child)
-            }
-
-            return deepMatches
-        },
-
-        countPredictions(node: DeepNode) {
-            PredictionService.getPredictions(node.id).then((predictionResponse: PredictionResponse) => {
-                this.synonymPredictions = predictionResponse.totalSynonymPredictions
-                this.childPredictions = predictionResponse.totalChildPredictions
-            })
+    countPredictions(node: DeepNode) {
+      PredictionService.getPredictions(node.id).then(
+        (predictionResponse: PredictionResponse) => {
+          this.synonymPredictions = predictionResponse.totalSynonymPredictions;
+          this.childPredictions = predictionResponse.totalChildPredictions;
         }
-    }
-})
+      );
+    },
+  },
+});

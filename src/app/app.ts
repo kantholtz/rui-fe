@@ -1,5 +1,5 @@
-import Header from "@/components/header/header.vue";
+import HeaderBar from "@/components/header/header.vue";
 
 export default {
-  components: { Header },
+  components: { HeaderBar },
 };

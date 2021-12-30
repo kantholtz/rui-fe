@@ -8,7 +8,6 @@
     <section>
       <ColHeader title="Taxonomy" />
       <Taxonomy
-        class="grid-content"
         :rootNodes="rootNodes"
         :selectedNode="selectedNode"
         @select="selectNode($event)"
@@ -20,28 +19,22 @@
       <!-- New Node -->
       <ColHeader title="Node Details" />
 
-      <template v-if="!creatingNewNode && !selectedNode">
-        <p>Please select a symptom from the taxonomy.</p>
-      </template>
+      <div>
+        <p class="px-5" v-if="!creatingNewNode && !selectedNode">
+          Please select a symptom from the taxonomy.
+        </p>
 
-      <template v-if="creatingNewNode">
-        <h1>New Node</h1>
-        <NewNode class="grid-content" @createNode="createNode($event)" />
-      </template>
+        <NewNode v-if="creatingNewNode" @createNode="createNode($event)" />
 
-      <!-- Node Details -->
-
-      <template v-if="!creatingNewNode && selectedNode">
-        <h1>Node Details</h1>
         <NodeDetails
-          class="grid-content"
+          v-if="!creatingNewNode && selectedNode"
           :node="selectedNode"
           @createEntity="createEntity($event)"
           @deleteEntity="deleteEntity($event)"
           @createNode="showCreateNode"
           @deleteNode="deleteNode($event)"
         />
-      </template>
+      </div>
     </section>
 
     <section>

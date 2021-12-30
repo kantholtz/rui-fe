@@ -5,12 +5,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        stone: colors.stone,
+        slate: colors.slate,
         sky: colors.sky,
         orange: colors.orange,
-        "lavis-red": {
-          500: "rgb(225, 0, 25)",
-        },
       },
     },
   },
