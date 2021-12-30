@@ -1,25 +1,28 @@
-import {defineComponent} from 'vue'
+import { defineComponent } from "vue";
+
+import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
 
 export default defineComponent({
-    name: 'UploadWarning',
+  name: "UploadWarning",
+  components: { ButtonRegular },
 
-    emits: {
-        cancel() {
-            return true
-        },
-
-        overwrite() {
-            return true
-        }
+  emits: {
+    cancel() {
+      return true;
     },
 
-    methods: {
-        onCancel(): void {
-            this.$emit('cancel')
-        },
+    overwrite() {
+      return true;
+    },
+  },
 
-        onOverwrite(): void {
-            this.$emit('overwrite')
-        }
-    }
-})
+  methods: {
+    onCancel(): void {
+      this.$emit("cancel");
+    },
+
+    onOverwrite(): void {
+      this.$emit("overwrite");
+    },
+  },
+});

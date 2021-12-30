@@ -1,18 +1,12 @@
-<div class="modal-background">
+<div class="bg-gray-300 bg-opacity-70 flex justify-center items-start absolute top-0 left-0 w-screen h-screen">
+  <div class="bg-white mt-20 px-16 py-14 rounded-lg text-center shadow-2xl">
+    <p class="text-xl mb-4">Uploading will overwrite the exitisting taxonomy and matches!</p>
+    <p class="text-xl mb-4">Do you want to continue?</p>
 
-    <div class="modal">
-        <header class="modal-header">
-            <h1>Caution</h1>
-            <div class="close-button" @click="onCancel">&times;</div>
-        </header>
-
-        <main class="modal-content">
-            <p class="message">Uploading will <b>overwrite</b> the existing taxonomy and matches!</p>
-            <div class="buttons">
-                <button class="button cancel" @click="onCancel">Cancel</button>
-                <button class="button continue" @click="onOverwrite">Overwrite</button>
-            </div>
-        </main>
+    <div class="pt-5">
+    <ButtonRegular class="text-xl mr-5" label="Continue" kind="sky" @click="onOverwrite" />
+    <ButtonRegular class="text-xl" label="Cancel" kind="pink" @click="onCancel" />
     </div>
 
+  </div>
 </div>

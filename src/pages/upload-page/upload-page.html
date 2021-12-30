@@ -1,21 +1,33 @@
-<LoadingOverlay :class="[showLoading ? 'block' : 'hidden']"
-                :message="loadingMessages.join('\n')"/>
+<LoadingOverlay
+  :class="[showLoading ? 'block' : 'hidden']"
+  :message="loadingMessages.join('\n')"
+/>
 
-<UploadWarning :class="[showUploadWarning ? 'block' : 'hidden']"
-               @cancel="showUploadWarning = false"
-               @overwrite="uploadAndRedirect"/>
+<UploadWarning
+  :class="[showUploadWarning ? 'block' : 'hidden']"
+  @cancel="showUploadWarning = false"
+  @overwrite="uploadAndRedirect"
+/>
 
-<form class="upload-form"
-      ref="form"
-      @submit.prevent="showUploadWarning = true">
+<div class="bg-white rounded-lg w-96 mx-auto px-10 py-5">
+  <form ref="form" @submit.prevent="showUploadWarning = true">
+    <label class="text-lg" for="symptaxUploadZip">Symptax Upload ZIP</label>
 
-    <label for="symptaxUploadZip">Symptax Upload ZIP</label>
-    <input id="symptaxUploadZip" class="upload-form-input"
-           @change="isFileSelected = true"
-           type="file" name="symptaxUploadZip">
+    <input
+      id="symptaxUploadZip"
+      class="my-5"
+      @change="isFileSelected = true"
+      type="file"
+      name="symptaxUploadZip"
+    />
 
-    <input class="upload-form-input"
-           type="submit"
-           value="Upload"
-           :disabled="!isFileSelected"/>
-</form>
+    <div class="text-center">
+      <input
+        class="px-3 py-1 rounded-lg font-bold transition-colors duration-300 bg-sky-400 text-white hover:bg-sky-700"
+        type="submit"
+        value="Upload"
+        :disabled="!isFileSelected"
+      />
+    </div>
+  </form>
+</div>

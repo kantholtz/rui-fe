@@ -3,6 +3,7 @@
 
   <div class="p-5 mb-5 bg-white rounded-lg">
     <ButtonRegular
+      v-if="(synonymPredictions + childPredictions) > 0"
       label="Show Predictions"
       kind="sky"
       class="mb-5 inline-block"
@@ -42,7 +43,7 @@
     <input
       class="border border-gray-500 mr-5 p-2"
       @change="createEntity($event)"
-      placeholder="New Entity"
+      placeholder="New Phrase"
     />
 
     <ButtonRegular label="Add" kind="sky" @click="createEntity(entity.id)" />
