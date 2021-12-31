@@ -1,9 +1,10 @@
 <li class="pl-5 mb-2">
   <!-- Clickable expand/collapse icon -->
 
-  <ButtonKnob v-if="!expandable" label="•" kind="grey" />
+  <ButtonKnob class="mr-2" v-if="!expandable" label="•" kind="grey" />
 
   <ButtonKnob
+    class="mr-2"
     v-if="expandable && !expanded"
     label="+"
     kind="sky"
@@ -11,6 +12,7 @@
   />
 
   <ButtonKnob
+    class="mr-2"
     v-if="expandable && expanded"
     label="-"
     kind="orange"

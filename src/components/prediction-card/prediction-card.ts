@@ -1,13 +1,38 @@
 import { defineComponent, PropType } from "vue";
 
-import { AssertionError } from "assert";
-import { Prediction } from "@/models/prediction/prediction";
-import { Predictions } from "@/models/prediction/predictions";
-import { PostEntity } from "@/models/entity/post-entity";
-import { PostNode } from "@/models/node/post-node";
-import { PredictionType } from "@/components/prediction-card/prediction-type";
-import { getNodeName } from "@/models/node/node";
+// import { AssertionError } from "assert";
+// import { PostEntity } from "@/models/entity/post-entity";
+// import { PostNode } from "@/models/node/post-node";
+// import { getNodeName } from "@/models/node/node";
 
+import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
+import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
+
+import { Prediction } from "@/models/prediction";
+
+export default defineComponent({
+  name: "PredictionCard",
+
+  components: { ButtonRegular, ButtonKnob },
+
+  props: {
+    prediction: { type: Object as PropType<Prediction>, required: true },
+    // node: { type: Node, required: true },
+  },
+
+  computed: {
+    formattedScore: function () {
+      return (
+        this.prediction.scoreNorm.toFixed(2) +
+        " (" +
+        this.prediction.score.toFixed(2) +
+        ")"
+      );
+    },
+  },
+});
+
+/*
 export default defineComponent({
   data() {
     return {
@@ -48,7 +73,7 @@ export default defineComponent({
      * event if child prediction is selected.
      *
      * Must only be called when a prediction is selected.
-     */
+     *
     annotate() {
       const selectedPrediction = this.selectedPrediction!;
 
@@ -94,10 +119,10 @@ export default defineComponent({
   name: "PredictionCard",
 
   props: {
-    predictions: {
-      type: Object as PropType<Predictions>,
-      required: true,
-    },
+    // predictions: {
+    //   type: Object as PropType<Predictions>,
+    //   required: true,
+    // },
 
     currentNodeId: {
       type: Number,
@@ -133,7 +158,7 @@ export default defineComponent({
     /**
      * Select the synonym prediction for the current node. If there is none, select
      * the child prediction for the current node. There must be one or both of these.
-     */
+     *
     currentNodeId: {
       immediate: true,
       handler(currentNodeId: number) {
@@ -166,3 +191,4 @@ export default defineComponent({
     },
   },
 });
+*/

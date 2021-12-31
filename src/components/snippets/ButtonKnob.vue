@@ -1,10 +1,10 @@
 <template>
-  <span
-    class="inline-block text-center w-6 h-6 mr-2 align-middle rounded-lg transition-colors duration-300"
+  <div
+    class="inline-block font-bold text-center w-6 h-6 rounded-lg transition-colors duration-300"
     :class="classes"
   >
     {{ label }}
-  </span>
+  </div>
 </template>
 
 <script lang="ts">

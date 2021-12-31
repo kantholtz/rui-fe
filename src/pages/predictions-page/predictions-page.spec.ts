@@ -3,11 +3,13 @@ import { flushPromises, shallowMount } from "@vue/test-utils";
 import PredictionCard from "@/components/prediction-card/prediction-card.vue";
 import PredictionsPage from "@/pages/predictions-page/predictions-page.vue";
 import TreeItem from "@/components/tree-item/tree-item.vue";
+
+import { EntityService } from "@/services/entity-service";
+import { NodeService } from "@/services/node-service";
+
 import { Predictions } from "@/models/prediction/predictions";
 import { DeepNode } from "@/models/node/deep-node";
-import { EntityService } from "@/services/entity-service";
 import { Entity } from "@/models/entity/entity";
-import { NodeService } from "@/services/node-service";
 import { PostEntity } from "@/models/entity/post-entity";
 import { PostNode } from "@/models/node/post-node";
 import { PredictionPatch } from "@/models/prediction/prediction-patch";

@@ -14,10 +14,14 @@ export default defineComponent({
   props: {
     label: String,
     kind: String,
+    enabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     classes: function () {
-      const defs: { [key: string]: string[] } = {
+      const enabledClasses: { [key: string]: string[] } = {
         grey: [
           "bg-gray-200",
           "text-gray-600",
@@ -39,7 +43,16 @@ export default defineComponent({
         ],
       };
 
-      return defs[this.kind || "grey"];
+      const disabledClasses: { [key: string]: string[] } = {
+        grey: ["bg-gray-200", "text-gray-400"],
+        sky: ["bg-sky-200", "text-white"],
+        orange: ["bg-orange-100", "text-white"],
+      };
+
+      const key = this.kind || "grey";
+      const classes = this.enabled ? enabledClasses[key] : disabledClasses[key];
+
+      return classes;
     },
   },
 });

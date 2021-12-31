@@ -1,8 +1,3 @@
-<LoadingOverlay
-  :class="[showLoading ? 'block' : 'hidden']"
-  :message="loadingMessages.join('\n')"
-/>
-
 <div class="container mx-auto center">
   <main class="grid grid-cols-3 gap-4">
     <section>
@@ -10,9 +5,9 @@
 
       <ul>
         <TreeItem
-          v-if="rootNode"
-          :node="rootNode"
-          :selectedNode="predictedNode"
+          v-if="root"
+          :node="root"
+          :selectedNode="node"
           :selectable="false"
         />
       </ul>
@@ -21,29 +16,33 @@
     <section>
       <ColHeader title="Synonym Predictions" />
 
-      <PredictionCard
-        v-for="(Predictions, index) of predictions"
-        :key="predictions.candidate"
-        :predictions="Predictions"
-        :currentNodeId="predictedNode.id"
-        @dismiss="dismissPredictions(predictions.candidate)"
-        @createEntity="createEntityAndDismissPrediction(index, $event)"
-        @createNode="createNodeAndDismissPrediction(index, $event)"
-      >
-      </PredictionCard>
+      <div v-if="!predictions">Loading...</div>
 
-      <PaginationBar
-        v-if="numberOfPages !== null"
-        :numberOfPages="numberOfPages"
-        @input="loadPredictions(nodeId, $event * 3, 3)"
-      >
-      </PaginationBar>
+      <PredictionCard
+        v-if="predictions"
+        v-for="prediction of predictions.synonyms"
+        :key="prediction.node.id"
+        :prediction="prediction"
+        :node="node"
+      />
+
+      <!-- @dismiss="dismissPredictions(predictions.candidate)" -->
+      <!-- @createEntity="createEntityAndDismissPrediction(index, $event)" -->
+      <!-- @createNode="createNodeAndDismissPrediction(index, $event)" -->
     </section>
 
     <section>
       <ColHeader title="Child Predictions" />
 
-      TODO: separate prediction lists
+      <div v-if="!predictions">Loading...</div>
+
+      <PredictionCard
+        v-if="predictions"
+        v-for="prediction of predictions.children"
+        :key="prediction.node.id"
+        :prediction="prediction"
+        :node="node"
+      />
     </section>
   </main>
 </div>

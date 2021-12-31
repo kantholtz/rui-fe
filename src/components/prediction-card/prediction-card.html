@@ -1,74 +1,22 @@
-<div>
-
-    <!-- Header -->
-
-    <header>
-        <b>{{ totalScoreNorm.toFixed(2) }}</b> ({{ totalScore.toFixed(2) }})
-    </header>
+<div class="border border-gray-300 rounded-lg bg-white p-5 mb-5 relative">
 
     <!-- Candidate Text -->
 
     <div>
-        <template v-for="(token, i) of tokens">
-            <span :class="{marked: tokenSelections[i]}"
-                  @click="tokenSelections[i] = !tokenSelections[i]">
-                {{ token }}
-            </span>
-            {{ ' ' }}
-        </template>
+      <ButtonKnob class="mr-2" label='x' kind='pink' />
+      <span class="text-sm text-gray-400">Score: {{ formattedScore }}</span>
     </div>
-
-    <!-- Prediction Items -->
 
     <div>
-        <h1>Is Synonym of</h1>
-        <table v-if="predictions.synonyms.length > 0">
-            <tr v-for="(synonymPrediction, index) of predictions.synonyms" :key="index">
-                <td :class="{selected: isPredictionSelected(PredictionType.SYNONYM, index)}"
-                    @click="selectedPrediction = {type:PredictionType.SYNONYM, index}">
-                    {{ synonymPrediction.scoreNorm.toFixed(2) }}
-                </td>
-                <td :class="{selected: isPredictionSelected(PredictionType.SYNONYM, index)}"
-                    @click="selectedPrediction = {type:PredictionType.SYNONYM, index}">
-                    {{ getNodeName(synonymPrediction.node) }}
-                </td>
-            </tr>
-        </table>
-        <span v-else>None</span>
+      <div class="mt-2 mb-3">
+        {{ prediction.context }}
+      </div>
 
-        <h1 >Is Child of</h1>
-        <table v-if="predictions.children.length > 0">
-            <tr v-for="(parentPrediction, index) of predictions.children" :key="index">
-                <td :class="{selected: isPredictionSelected(PredictionType.CHILD, index)}"
-                    @click="selectedPrediction = {type:PredictionType.CHILD, index}">
-                    {{ parentPrediction.scoreNorm.toFixed(2) }}
-                </td>
-                <td :class="{selected: isPredictionSelected(PredictionType.CHILD, index)}"
-                    @click="selectedPrediction = {type:PredictionType.CHILD, index}">
-                    {{ getNodeName(parentPrediction.node) }}
-                </td>
-            </tr>
-        </table>
-        <span v-else>None</span>
+      <div class="flex">
+        <input class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2" type="" name="" value="" />
+        <ButtonRegular class="mr-2" label='Filter' :enabled="false" kind='orange' />
+        <ButtonRegular label='Annotate' :enabled="false" kind='sky' />
+      </div>
+
     </div>
-
-    <!-- Footer -->
-
-    <footer>
-        <button id="dismiss-button"
-                @click="$emit('dismiss')">
-            Dismiss
-        </button>
-
-        <input id="mention" ref="mention"
-               type="text"
-               v-model="mentionInput"
-               @input="userEditsMentionInput = true"/>
-
-        <button id="annotate-button"
-                :disabled="mentionInput === ''"
-                @click="annotate">
-            Annotate
-        </button>
-    </footer>
 </div>

@@ -1,3 +1,8 @@
+export enum Relations {
+  SYNONYM,
+  CHILD,
+}
+
 export interface Prediction {
   score: number;
   scoreNorm: number;
