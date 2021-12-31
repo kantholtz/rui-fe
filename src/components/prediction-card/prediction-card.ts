@@ -20,6 +20,14 @@ export default defineComponent({
     // node: { type: Node, required: true },
   },
 
+  data() {
+    return {
+      tokens: undefined as undefined | string[],
+      tokenSelections: undefined as undefined | boolean[],
+      mentionInput: "",
+    };
+  },
+
   computed: {
     formattedScore: function () {
       return (
@@ -29,11 +37,51 @@ export default defineComponent({
         ")"
       );
     },
+    hasAnnotation: function () {
+      return this.mentionInput != false;
+    },
   },
 
   emits: {
     dismiss() {
       return true;
+    },
+  },
+
+  watch: {
+    prediction: {
+      immediate: true,
+      handler(prediction: Prediction) {
+        this.tokens = prediction.context.split(" ");
+        this.tokenSelections = new Array<boolean>(this.tokens.length).fill(
+          false
+        );
+      },
+    },
+
+    tokenSelections: {
+      deep: true,
+      handler(tokenSelections: boolean[]) {
+        const tokens = this.tokens!;
+
+        this.mentionInput = tokenSelections
+          .map((tokenSelection, index) =>
+            tokenSelection ? tokens[index] : null
+          )
+          .filter((token) => token !== null)
+          .join(" ");
+      },
+    },
+  },
+
+  methods: {
+    annotate() {
+      const mentionInput = this.$refs.mention as HTMLInputElement;
+      const mention = mentionInput.value;
+
+      console.log("annotate!", mention);
+
+      // this.$emit("createNode", postNode);
     },
   },
 });

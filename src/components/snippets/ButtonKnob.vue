@@ -14,12 +14,18 @@ export default defineComponent({
   props: {
     label: String,
     kind: String,
+    enabled: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {
     classes: function () {
-      const defs: { [key: string]: string[] } = {
-        grey: ["bg-gray-200", "text-gray-200"],
+      // --
+
+      const enabledClasses: { [key: string]: string[] } = {
+        grey: ["bg-gray-200", "text-gray-400"],
         sky: [
           "bg-sky-400",
           "text-sky-100",
@@ -40,7 +46,24 @@ export default defineComponent({
         ],
       };
 
-      return defs[this.kind || "grey"];
+      const disabledClasses: { [key: string]: string[] } = {
+        grey: ["bg-gray-200", "text-gray-200"],
+        sky: ["bg-sky-200", "text-white"],
+        orange: ["bg-orange-100", "text-white"],
+      };
+
+      // --
+
+      const key = this.kind || "grey";
+      const selection = this.enabled
+        ? enabledClasses[key]
+        : disabledClasses[key];
+
+      if (this.enabled) {
+        selection.push("cursor-pointer");
+      }
+
+      return selection;
     },
   },
 });

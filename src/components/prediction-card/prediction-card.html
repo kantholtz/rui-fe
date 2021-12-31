@@ -1,22 +1,39 @@
 <div class="border border-gray-300 rounded-lg bg-white p-5 mb-5 relative">
+  <!-- Candidate Text -->
 
-    <!-- Candidate Text -->
+  <div>
+    <ButtonKnob class="mr-2" label="x" kind="pink" @click="$emit('dismiss')" />
+    <span class="text-sm text-gray-400">Score: {{ formattedScore }}</span>
+  </div>
 
-    <div>
-      <ButtonKnob class="mr-2" label='x' kind='pink' @click="$emit('dismiss')" />
-      <span class="text-sm text-gray-400">Score: {{ formattedScore }}</span>
-    </div>
+  <div class="mt-2 mb-3">
+    <template v-for="(token, i) of tokens">
+      <span
+        :class="[tokenSelections[i] ? ['font-bold', 'text-pink-600'] : '']"
+        @click="tokenSelections[i] = !tokenSelections[i]"
+      >
+        {{ token }}
+      </span>
+      {{ ' ' }}
+    </template>
+  </div>
 
-    <div>
-      <div class="mt-2 mb-3">
-        {{ prediction.context }}
-      </div>
+  <div class="flex">
+    <input
+      class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2"
+      id="mention"
+      ref="mention"
+      type="text"
+      v-model="mentionInput"
+      @input="userEditsMentionInput = true"
+    />
 
-      <div class="flex">
-        <input class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2" type="" name="" value="" />
-        <ButtonRegular class="mr-2" label='Filter' :enabled="false" kind='orange' />
-        <ButtonRegular label='Annotate' :enabled="false" kind='sky' />
-      </div>
-
-    </div>
+    <ButtonRegular
+      class="mr-2"
+      label="Filter"
+      :enabled="hasAnnotation"
+      kind="orange"
+    />
+    <ButtonRegular label="Annotate" :enabled="hasAnnotation" kind="sky" />
+  </div>
 </div>

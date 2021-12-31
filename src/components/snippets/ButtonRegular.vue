@@ -21,6 +21,8 @@ export default defineComponent({
   },
   computed: {
     classes: function () {
+      // --
+
       const enabledClasses: { [key: string]: string[] } = {
         grey: [
           "bg-gray-200",
@@ -49,10 +51,18 @@ export default defineComponent({
         orange: ["bg-orange-100", "text-white"],
       };
 
-      const key = this.kind || "grey";
-      const classes = this.enabled ? enabledClasses[key] : disabledClasses[key];
+      // --
 
-      return classes;
+      const key = this.kind || "grey";
+      const selection = this.enabled
+        ? enabledClasses[key]
+        : disabledClasses[key];
+
+      if (this.enabled) {
+        selection.push("cursor-pointer");
+      }
+
+      return selection;
     },
   },
 });

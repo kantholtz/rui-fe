@@ -20,14 +20,13 @@
 
       <PredictionCard
         v-if="predictions"
-        v-for="index of 20"
+        v-for="index of Math.min(predictions.synonyms.length, limit)"
         :key="predictions.synonyms[index].pid"
         :prediction="predictions.synonyms[index]"
         :node="node"
         @dismiss="dismissPrediction(predictions.synonyms[index], index, 'synonyms')"
       />
 
-      <!-- @dismiss="dismissPredictions(predictions.candidate)" -->
       <!-- @createEntity="createEntityAndDismissPrediction(index, $event)" -->
       <!-- @createNode="createNodeAndDismissPrediction(index, $event)" -->
     </section>
@@ -39,7 +38,7 @@
 
       <PredictionCard
         v-if="predictions"
-        v-for="index of 20"
+        v-for="index of Math.min(predictions.children.length, limit)"
         :key="predictions.children[index].pid"
         :prediction="predictions.children[index]"
         :node="node"

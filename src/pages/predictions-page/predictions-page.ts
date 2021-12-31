@@ -30,6 +30,8 @@ export default defineComponent({
       node: null as DeepNode | null,
 
       predictions: null as PredictionResponse | null,
+
+      limit: 20,
     };
   },
 

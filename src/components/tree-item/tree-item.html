@@ -1,7 +1,13 @@
 <li class="pl-5 mb-2">
   <!-- Clickable expand/collapse icon -->
 
-  <ButtonKnob class="mr-2" v-if="!expandable" label="•" kind="grey" />
+  <ButtonKnob
+    class="mr-2"
+    v-if="!expandable"
+    label="•"
+    kind="grey"
+    :enabled="false"
+  />
 
   <ButtonKnob
     class="mr-2"
@@ -22,6 +28,7 @@
   <!-- Node name -->
 
   <a
+    :class="{'cursor-pointer': selectable}"
     :class="{'font-bold': node === selectedNode, selectable}"
     @click="selectable && $emit('select', node)"
   >
