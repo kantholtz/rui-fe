@@ -3,7 +3,7 @@
 
   <div class="p-5 mb-5 bg-white rounded-lg">
     <ButtonRegular
-      v-if="(synonymPredictions + childPredictions) > 0"
+      v-bind:enabled="hasPredictions"
       label="Show Predictions"
       kind="sky"
       class="mb-5 inline-block"
@@ -13,12 +13,12 @@
     <div class="grid grid-cols-3 gap-x-5">
       <div class="font-bold">Synonyms</div>
       <div class="col-span-2">
-        {{ synonymPredictions === null ? '...' : synonymPredictions }}
+        {{ totalSynonyms === null ? 'loading...' : totalSynonyms }}
       </div>
 
       <div class="font-bold">Children</div>
       <div class="col-span-2">
-        {{ childPredictions === null ? '...' : childPredictions }}
+        {{ totalChildren === null ? 'loading...' : totalChildren }}
       </div>
     </div>
   </div>

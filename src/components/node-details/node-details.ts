@@ -3,8 +3,9 @@ import { defineComponent, PropType } from "vue";
 import { DeepNode } from "@/models/node/deep-node";
 import { Entity } from "@/models/entity/entity";
 import { PostEntity } from "@/models/entity/post-entity";
-import { PredictionResponse } from "@/models/prediction/prediction-response";
+
 import { PredictionService } from "@/services/prediction-service";
+import { PredictionResponse } from "@/models/prediction";
 
 import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
 import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
@@ -15,6 +16,15 @@ export default defineComponent({
 
   props: {
     node: Object as PropType<DeepNode>,
+  },
+
+  computed: {
+    totalPredictions: function () {
+      return (this.totalSynonyms || 0) + (this.totalChildren || 0);
+    },
+    hasPredictions: function () {
+      return this.totalPredictions > 0;
+    },
   },
 
   watch: {
@@ -55,9 +65,8 @@ export default defineComponent({
     return {
       shallowNodeMatches: null as number | null,
       deepNodeMatches: null as number | null,
-
-      synonymPredictions: null as number | null,
-      childPredictions: null as number | null,
+      totalSynonyms: null as number | null,
+      totalChildren: null as number | null,
     };
   },
 
@@ -66,8 +75,8 @@ export default defineComponent({
       this.shallowNodeMatches = null;
       this.deepNodeMatches = null;
 
-      this.synonymPredictions = null;
-      this.childPredictions = null;
+      this.totalSynonyms = null;
+      this.totalChildren = null;
     },
 
     createEntity(event: Event) {
@@ -124,9 +133,9 @@ export default defineComponent({
 
     countPredictions(node: DeepNode) {
       PredictionService.getPredictions(node.id).then(
-        (predictionResponse: PredictionResponse) => {
-          this.synonymPredictions = predictionResponse.totalSynonymPredictions;
-          this.childPredictions = predictionResponse.totalChildPredictions;
+        (resp: PredictionResponse) => {
+          this.totalSynonyms = resp.totalSynonyms;
+          this.totalChildren = resp.totalChildren;
         }
       );
     },
