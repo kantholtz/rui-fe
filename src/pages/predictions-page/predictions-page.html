@@ -20,10 +20,11 @@
 
       <PredictionCard
         v-if="predictions"
-        v-for="prediction of predictions.synonyms"
-        :key="prediction.node.id"
-        :prediction="prediction"
+        v-for="index of 20"
+        :key="predictions.synonyms[index].pid"
+        :prediction="predictions.synonyms[index]"
         :node="node"
+        @dismiss="dismissPrediction(predictions.synonyms[index], index, 'synonyms')"
       />
 
       <!-- @dismiss="dismissPredictions(predictions.candidate)" -->
@@ -38,10 +39,11 @@
 
       <PredictionCard
         v-if="predictions"
-        v-for="prediction of predictions.children"
-        :key="prediction.node.id"
-        :prediction="prediction"
+        v-for="index of 20"
+        :key="predictions.children[index].pid"
+        :prediction="predictions.children[index]"
         :node="node"
+        @dismiss="dismissPrediction(predictions.children[index], index, 'children')"
       />
     </section>
   </main>

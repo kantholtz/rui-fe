@@ -3,7 +3,7 @@
     <!-- Candidate Text -->
 
     <div>
-      <ButtonKnob class="mr-2" label='x' kind='pink' />
+      <ButtonKnob class="mr-2" label='x' kind='pink' @click="$emit('dismiss')" />
       <span class="text-sm text-gray-400">Score: {{ formattedScore }}</span>
     </div>
 

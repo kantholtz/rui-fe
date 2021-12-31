@@ -55,7 +55,7 @@ export default defineComponent({
     },
 
     loadPredictions(nid: number): void {
-      const limit = 10;
+      const limit = 500;
 
       PredictionService.getPredictions(nid, 0, limit).then(
         (predictionResponse: PredictionResponse) => {
@@ -90,6 +90,17 @@ export default defineComponent({
       }
 
       return null;
+    },
+
+    dismissPrediction(pred: Prediction, index: number, kind: string) {
+      const arr =
+        kind === "synonyms"
+          ? this.predictions.synonyms
+          : this.predictions.children;
+
+      arr.splice(index, 1);
+
+      PredictionService.delPrediction(pred.pid);
     },
 
     /**

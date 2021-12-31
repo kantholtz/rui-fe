@@ -4,6 +4,8 @@ export enum Relations {
 }
 
 export interface Prediction {
+  pid: number;
+  nid: number;
   score: number;
   scoreNorm: number;
   context: string;
