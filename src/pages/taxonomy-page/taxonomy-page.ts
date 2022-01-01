@@ -27,21 +27,21 @@ export default defineComponent({
     return {
       rootNodes: [] as DeepNode[],
       selectedNode: null as DeepNode | null,
-
       creatingNewNode: false,
-
-      loadingMessages: [] as string[],
-      showLoading: false,
-      showLoadingTimeout: -1,
     };
   },
 
   computed: {
     nodeTitle: function (): string {
+      if (this.creatingNewNode) {
+        return "Create New Node";
+      }
+
       if (this.selectedNode) {
-        return `Node: ${getNodeName(this.selectedNode)} (id=${
-          this.selectedNode.nid
-        })`;
+        const name = getNodeName(this.selectedNode);
+        const nid = this.selectedNode.nid;
+
+        return `Node: ${name} (id=${nid})`;
       }
 
       return "Node Details";
@@ -140,6 +140,17 @@ export default defineComponent({
     },
 
     deleteEntity(eid: number): void {
+      if (this.selectedNode === null) {
+        console.error("deleteEntity: selectedNode is null");
+        return;
+      }
+
+      for (let i = 0; i < this.selectedNode.entities.length; i += 1) {
+        if (this.selectedNode.entities[i].eid === eid) {
+          this.selectedNode.entities.splice(i, 1);
+        }
+      }
+
       EntityService.deleteEntity(eid).then(() => {
         this.reloadTaxonomy();
       });

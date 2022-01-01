@@ -1,37 +1,30 @@
-<div>
+<div class="border border-gray-300 rounded-lg bg-white p-5 mb-5">
+  <div class="mb-3">{{ entityNames.length }} Phrases</div>
 
-  <h1>New Node</h1>
-    <!-- Entities -->
+  <ul>
+    <li class="mb-3" v-for="(entityName, index) of entityNames" :key="index">
+      <ButtonKnob label="x" kind="pink" @click="entityNames.splice(index, 1)" />
+      {{ entityName }}
+    </li>
 
-    {{ entityNames.length }}
-    {{ entityNames.length === 1 ? 'Entity' : 'Entities' }}:
+    <li class="flex mb-3">
+      <input
+        class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2 px-2"
+        @change="addEntityName($event)"
+        placeholder="New Phrase"
+      />
+      <ButtonKnob label="+" kind="sky" @click="addEntityName(entity.eid)" />
+    </li>
+  </ul>
 
-    <ul class="entity-list">
-        <li v-for="(entityName, index) of entityNames" :key="index">
-            {{ entityName }}
+  <!-- Create Node Button -->
 
-            <button class="delete-button" @click="entityNames.splice(index, 1)">
-                Delete
-            </button>
-        </li>
-
-        <li>
-            <input @change="addEntityName($event)"
-                   placeholder="New Entity"
-
-            /> <button class="create-button d-inline-block"
-                       @click="addEntityName(entity.eid)">
-                Add
-            </button>
-        </li>
-    </ul>
-
-    <!-- Create Node Button -->
-
-    <button class="create-button mt-16"
-            :class="[entityNames.length > 0 ? 'create-button' : 'disabled-button']"
-            :disabled="entityNames.length === 0"
-            @click="$emit('createNode', entityNames)">
-        Create Node
-    </button>
+  <ButtonRegular
+    label="Add Node"
+    kind="sky"
+    class="mt-2 inline-block"
+    :class="[entityNames.length > 0 ? 'create-button' : 'disabled-button']"
+    :enabled="entityNames.length !== 0"
+    @click="$emit('createNode', entityNames)"
+  />
 </div>

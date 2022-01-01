@@ -96,7 +96,6 @@ export default defineComponent({
     deleteEntity(eid: number): void {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const node = this.node!;
-
       if (node.entities.length > 1) {
         this.$emit("deleteEntity", eid);
       }
