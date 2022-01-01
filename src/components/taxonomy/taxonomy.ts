@@ -2,7 +2,7 @@ import { defineComponent, PropType } from "vue";
 
 import TreeItem from "@/components/tree-item/tree-item.vue";
 import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
-import { DeepNode } from "@/models/node/deep-node";
+import { DeepNode } from "@/models/node";
 
 export default defineComponent({
   name: "Taxonomy",

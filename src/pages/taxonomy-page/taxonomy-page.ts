@@ -1,23 +1,21 @@
 import { defineComponent } from "vue";
 
-import LoadingOverlay from "@/components/loading-overlay/loading-overlay.vue";
 import Matches from "@/components/matches/matches.vue";
 import NewNode from "@/components/new-node/new-node.vue";
 import NodeDetails from "@/components/node-details/node-details.vue";
 import Taxonomy from "@/components/taxonomy/taxonomy.vue";
 import ColHeader from "@/components/snippets/ColHeader.vue";
 
-import { DeepNode } from "@/models/node/deep-node";
+import { getNodeName, DeepNode, PostNode } from "@/models/node";
+import { PostEntity } from "@/models/entity";
+
 import { EntityService } from "@/services/entity-service";
 import { NodeService } from "@/services/node-service";
-import { PostEntity } from "@/models/entity/post-entity";
-import { PostNode } from "@/models/node/post-node";
 
 export default defineComponent({
   name: "TaxonomyPage",
 
   components: {
-    LoadingOverlay,
     NewNode,
     NodeDetails,
     Matches,
@@ -28,7 +26,6 @@ export default defineComponent({
   data() {
     return {
       rootNodes: [] as DeepNode[],
-
       selectedNode: null as DeepNode | null,
 
       creatingNewNode: false,
@@ -39,43 +36,26 @@ export default defineComponent({
     };
   },
 
+  computed: {
+    nodeTitle: function (): string {
+      if (this.selectedNode) {
+        return `Node: ${getNodeName(this.selectedNode)} (id=${
+          this.selectedNode.nid
+        })`;
+      }
+
+      return "Node Details";
+    },
+  },
+
   mounted() {
     this.loadTaxonomy();
   },
 
   methods: {
-    startLoading(loadingMessage: string): void {
-      this.loadingMessages.push(loadingMessage);
-
-      if (this.showLoadingTimeout === -1) {
-        this.showLoadingTimeout = window.setTimeout(
-          () => (this.showLoading = true),
-          500
-        );
-      }
-    },
-
-    stopLoading(loadingMessage: string): void {
-      // Remove loading message
-      const index = this.loadingMessages.indexOf(loadingMessage);
-      if (index !== -1) {
-        this.loadingMessages.splice(index, 1);
-      }
-
-      // Stop timeout if there are no further loading messages
-      if (this.loadingMessages.length === 0) {
-        window.clearTimeout(this.showLoadingTimeout);
-        this.showLoadingTimeout = -1;
-        this.showLoading = false;
-      }
-    },
-
     loadTaxonomy(): void {
-      this.startLoading("Loading nodes...");
       NodeService.getNodes().then((rootNodes: DeepNode[]) => {
         this.rootNodes = rootNodes;
-
-        this.stopLoading("Loading nodes...");
       });
     },
 
@@ -88,11 +68,11 @@ export default defineComponent({
     },
 
     reloadTaxonomyWithSelectedNode(selectedNode: DeepNode): void {
-      const selectedNodeId = selectedNode.id;
+      const nid = selectedNode.nid;
 
       function findNodeInNodes(nodes: DeepNode[], id: number): DeepNode | null {
         for (const node of nodes) {
-          if (node.id === id) {
+          if (node.nid === id) {
             return node;
           }
 
@@ -106,13 +86,9 @@ export default defineComponent({
         return null;
       }
 
-      this.startLoading("Loading nodes...");
       NodeService.getNodes().then((nodes: DeepNode[]) => {
         this.rootNodes = nodes;
-
-        this.selectedNode = findNodeInNodes(nodes, selectedNodeId);
-
-        this.stopLoading("Loading nodes...");
+        this.selectedNode = findNodeInNodes(nodes, nid);
       });
     },
 
@@ -136,48 +112,36 @@ export default defineComponent({
       });
 
       const postNode: PostNode = {
-        parentId: this.selectedNode ? this.selectedNode.id : null,
+        pid: this.selectedNode ? this.selectedNode.nid : null,
         entities: postNodeEntities,
       };
 
-      this.startLoading("Creating node...");
       NodeService.postNode(postNode).then(() => {
         this.reloadTaxonomy();
-
-        this.stopLoading("Creating node...");
       });
 
       this.creatingNewNode = false;
     },
 
     deleteNode(node: DeepNode): void {
-      this.startLoading("Deleting node...");
-      NodeService.deleteNode(node.id).then(() => {
-        if (this.selectedNode && node.id === this.selectedNode.id) {
+      NodeService.deleteNode(node.nid).then(() => {
+        if (this.selectedNode && node.nid === this.selectedNode.nid) {
           this.selectedNode = null;
         }
 
         this.reloadTaxonomy();
-
-        this.stopLoading("Deleting node...");
       });
     },
 
     createEntity(postEntity: PostEntity): void {
-      this.startLoading("Creating entity...");
       EntityService.postEntity(postEntity).then(() => {
         this.reloadTaxonomy();
-
-        this.stopLoading("Creating entity...");
       });
     },
 
-    deleteEntity(entityId: number): void {
-      this.startLoading("Deleting entity...");
-      EntityService.deleteEntity(entityId).then(() => {
+    deleteEntity(eid: number): void {
+      EntityService.deleteEntity(eid).then(() => {
         this.reloadTaxonomy();
-
-        this.stopLoading("Deleting entity...");
       });
     },
   },

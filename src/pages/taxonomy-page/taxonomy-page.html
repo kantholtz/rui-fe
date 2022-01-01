@@ -1,8 +1,3 @@
-<LoadingOverlay
-  :class="[showLoading ? 'block' : 'hidden']"
-  :message="loadingMessages.join('\n')"
-/>
-
 <div class="container mx-auto center">
   <main class="grid grid-cols-3 gap-4">
     <section>
@@ -17,7 +12,7 @@
 
     <section>
       <!-- New Node -->
-      <ColHeader title="Node Details" />
+      <ColHeader :title="nodeTitle" />
 
       <div>
         <p class="px-5" v-if="!creatingNewNode && !selectedNode">

@@ -1,8 +1,7 @@
 import { defineComponent, PropType } from "vue";
 
-import { DeepNode } from "@/models/node/deep-node";
-import { Entity } from "@/models/entity/entity";
-import { PostEntity } from "@/models/entity/post-entity";
+import { DeepNode } from "@/models/node";
+import { Entity, PostEntity } from "@/models/entity";
 
 import { PredictionService } from "@/services/prediction-service";
 import { PredictionResponse } from "@/models/prediction";
@@ -56,7 +55,7 @@ export default defineComponent({
       return true;
     },
 
-    deleteEntity(entityId: number) {
+    deleteEntity(eid: number) {
       return true;
     },
   },
@@ -85,7 +84,7 @@ export default defineComponent({
       const input = event.target as HTMLInputElement;
 
       const postEntity: PostEntity = {
-        nodeId: node.id,
+        nid: node.nid,
         name: input.value,
       };
 
@@ -94,12 +93,12 @@ export default defineComponent({
       input.value = "";
     },
 
-    deleteEntity(entityId: number): void {
+    deleteEntity(eid: number): void {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const node = this.node!;
 
       if (node.entities.length > 1) {
-        this.$emit("deleteEntity", entityId);
+        this.$emit("deleteEntity", eid);
       }
     },
 
@@ -132,7 +131,7 @@ export default defineComponent({
     },
 
     countPredictions(node: DeepNode) {
-      PredictionService.getPredictions(node.id).then(
+      PredictionService.getPredictions(node.nid).then(
         (resp: PredictionResponse) => {
           this.totalSynonyms = resp.totalSynonyms;
           this.totalChildren = resp.totalChildren;

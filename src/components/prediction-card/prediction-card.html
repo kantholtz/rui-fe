@@ -6,9 +6,10 @@
     <span class="text-sm text-gray-400">Score: {{ formattedScore }}</span>
   </div>
 
-  <div class="mt-2 mb-3">
+  <div class="mt-2">
     <template v-for="(token, i) of tokens">
       <span
+        class="cursor-pointer"
         :class="[tokenSelections[i] ? ['font-bold', 'text-pink-600'] : '']"
         @click="tokenSelections[i] = !tokenSelections[i]"
       >
@@ -18,9 +19,9 @@
     </template>
   </div>
 
-  <div class="flex">
+  <div class="flex pt-3" v-if="hasAnnotation">
     <input
-      class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2"
+      class="flex-grow rounded-lg border border-gray-300 bg-gray-50 mr-2 px-2"
       id="mention"
       ref="mention"
       type="text"

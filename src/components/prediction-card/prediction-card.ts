@@ -38,7 +38,7 @@ export default defineComponent({
       );
     },
     hasAnnotation: function () {
-      return this.mentionInput != false;
+      return this.mentionInput !== "";
     },
   },
 
@@ -141,7 +141,7 @@ export default defineComponent({
         const selectedNode = selectedSynonymPrediction.node;
 
         const postEntity: PostEntity = {
-          nodeId: selectedNode.id,
+          nid: selectedNode.nid,
           name: mention,
         };
 
@@ -153,7 +153,7 @@ export default defineComponent({
         const selectedNode = selectedParentPrediction.node;
 
         const postNode: PostNode = {
-          parentId: selectedNode.id,
+          parentId: selectedNode.nid,
           entities: [{ name: mention }],
         };
 
@@ -222,7 +222,7 @@ export default defineComponent({
         const synonyms = this.predictions.synonyms;
         for (let i = 0; i < synonyms.length; i++) {
           const synonymPrediction = synonyms[i];
-          if (synonymPrediction.node.id === currentNodeId) {
+          if (synonymPrediction.node.nid === currentNodeId) {
             this.selectedPrediction = {
               type: PredictionType.SYNONYM,
               index: i,
@@ -234,7 +234,7 @@ export default defineComponent({
         const children = this.predictions.children;
         for (let i = 0; i < children.length; i++) {
           const parentPrediction = children[i];
-          if (parentPrediction.node.id === currentNodeId) {
+          if (parentPrediction.node.nid === currentNodeId) {
             this.selectedPrediction = { type: PredictionType.CHILD, index: i };
             return;
           }

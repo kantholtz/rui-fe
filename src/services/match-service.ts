@@ -1,4 +1,4 @@
-import { Match } from "@/models/match/match";
+import { Match } from "@/models/match";
 
 export const MatchService = {
   getMatches(entity: number, offset = 0, limit = 6): Promise<Match[]> {

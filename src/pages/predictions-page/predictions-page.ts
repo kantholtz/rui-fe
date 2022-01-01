@@ -4,13 +4,10 @@ import PredictionCard from "@/components/prediction-card/prediction-card.vue";
 import TreeItem from "@/components/tree-item/tree-item.vue";
 import ColHeader from "@/components/snippets/ColHeader.vue";
 
-import { DeepNode } from "@/models/node/deep-node";
-// import { EntityService } from "@/services/entity-service";
+import { DeepNode } from "@/models/node";
 import { NodeService } from "@/services/node-service";
-// import { PostEntity } from "@/models/entity/post-entity";
-// import { PostNode } from "@/models/node/post-node";
 
-import { PredictionResponse } from "@/models/prediction";
+import { Prediction, PredictionResponse } from "@/models/prediction";
 import { PredictionService } from "@/services/prediction-service";
 
 export default defineComponent({
@@ -79,7 +76,7 @@ export default defineComponent({
     },
 
     findNode(node: DeepNode, nid: number): DeepNode | null {
-      if (node.id === nid) {
+      if (node.nid === nid) {
         return node;
       }
 
@@ -95,6 +92,8 @@ export default defineComponent({
     },
 
     dismissPrediction(pred: Prediction, index: number, kind: string) {
+      if (this.predictions === null) return;
+
       const arr =
         kind === "synonyms"
           ? this.predictions.synonyms

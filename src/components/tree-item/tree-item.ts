@@ -1,7 +1,6 @@
 import { defineComponent, PropType } from "vue";
+import { getNodeName, DeepNode } from "@/models/node";
 
-import { DeepNode } from "@/models/node/deep-node";
-import { getNodeName } from "@/models/node/node";
 import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
 
 export default defineComponent({

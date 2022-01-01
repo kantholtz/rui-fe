@@ -7,7 +7,7 @@
       label="Show Predictions"
       kind="sky"
       class="mb-5 inline-block"
-      @click="$router.push(`/predictions/${node.id}`)"
+      @click="$router.push(`/predictions/${node.nid}`)"
     />
 
     <div class="grid grid-cols-3 gap-x-5">
@@ -28,8 +28,8 @@
   <div class="p-5 mb-5 bg-white border border-gray-300 rounded-lg">
     <h3 class="text-lg mb-3">Phrases ({{ node.entities.length }})</h3>
     <ul class="pl-5 mb-5">
-      <li v-for="entity of node.entities" :key="entity.id" class="mb-2">
-        <ButtonKnob @click="deleteEntity(entity.id)" kind="pink" label="x" />
+      <li v-for="entity of node.entities" :key="entity.eid" class="mb-2">
+        <ButtonKnob @click="deleteEntity(entity.eid)" kind="pink" label="x" />
 
         {{ entity.name }}
 
@@ -46,7 +46,7 @@
       placeholder="New Phrase"
     />
 
-    <ButtonRegular label="Add" kind="sky" @click="createEntity(entity.id)" />
+    <ButtonRegular label="Add" kind="sky" @click="createEntity(entity.eid)" />
   </div>
 
   <!-- matches -->

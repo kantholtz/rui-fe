@@ -1,7 +1,7 @@
 import { defineComponent, PropType } from "vue";
 
-import { DeepNode } from "@/models/node/deep-node";
-import { Match } from "@/models/match/match";
+import { DeepNode } from "@/models/node";
+import { Match } from "@/models/match";
 import { MatchService } from "@/services/match-service";
 
 import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
@@ -42,8 +42,8 @@ export default defineComponent({
 
       if (node) {
         for (const entity of node.entities) {
-          MatchService.getMatches(entity.id).then((matches: Match[]) => {
-            this.entityToMatchesData[entity.id] = {
+          MatchService.getMatches(entity.eid).then((matches: Match[]) => {
+            this.entityToMatchesData[entity.eid] = {
               name: entity.name,
               matchesCount: entity.matchesCount,
               matches: matches,
@@ -53,12 +53,12 @@ export default defineComponent({
       }
     },
 
-    loadMoreMatches(entityId: number): void {
-      const loadedEntityMatches = this.entityToMatchesData[entityId].matches;
+    loadMoreMatches(eid: number): void {
+      const loadedEntityMatches = this.entityToMatchesData[eid].matches;
 
-      MatchService.getMatches(entityId, loadedEntityMatches.length).then(
+      MatchService.getMatches(eid, loadedEntityMatches.length).then(
         (matches: Match[]) => {
-          this.entityToMatchesData[entityId].matches.push(...matches);
+          this.entityToMatchesData[eid].matches.push(...matches);
         }
       );
     },
