@@ -1,4 +1,6 @@
 <div>
+  <div v-if="!rootNodes.length">Loading...</div>
+
   <ul>
     <TreeItem
       v-for="rootNode in rootNodes"

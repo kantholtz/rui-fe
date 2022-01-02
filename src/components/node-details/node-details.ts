@@ -4,7 +4,7 @@ import { DeepNode } from "@/models/node";
 import { Entity, PostEntity } from "@/models/entity";
 
 import { PredictionService } from "@/services/prediction-service";
-import { PredictionResponse } from "@/models/prediction";
+import { Predictions } from "@/models/prediction";
 
 import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
 import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
@@ -130,12 +130,10 @@ export default defineComponent({
     },
 
     countPredictions(node: DeepNode) {
-      PredictionService.getPredictions(node.nid).then(
-        (resp: PredictionResponse) => {
-          this.totalSynonyms = resp.totalSynonyms;
-          this.totalChildren = resp.totalChildren;
-        }
-      );
+      PredictionService.getPredictions(node.nid).then((resp: Predictions) => {
+        this.totalSynonyms = resp.totalSynonyms;
+        this.totalChildren = resp.totalChildren;
+      });
     },
   },
 });

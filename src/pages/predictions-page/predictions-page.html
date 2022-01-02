@@ -14,7 +14,7 @@
     </section>
 
     <section>
-      <ColHeader title="Synonym Predictions" />
+      <ColHeader :title="(!predictions) ? 'Synonym Predictions' : `${predictions.totalSynonyms} Synonym Predictions`" />
 
       <div v-if="!predictions">Loading...</div>
 
@@ -22,17 +22,17 @@
         v-if="predictions"
         v-for="index of Math.min(predictions.synonyms.length, limit)"
         :key="predictions.synonyms[index].pid"
-        :prediction="predictions.synonyms[index]"
+        relation="synonym"
         :node="node"
-        @dismiss="dismissPrediction(predictions.synonyms[index], index, 'synonyms')"
+        :nodes="nodes"
+        :prediction="predictions.synonyms[index]"
+        @dismiss="dismiss(predictions.synonyms[index], index, 'synonym')"
+        @annotate="(annotation) => annotate(predictions.synonyms[index], annotation, 'synonym')"
       />
-
-      <!-- @createEntity="createEntityAndDismissPrediction(index, $event)" -->
-      <!-- @createNode="createNodeAndDismissPrediction(index, $event)" -->
     </section>
 
     <section>
-      <ColHeader title="Child Predictions" />
+      <ColHeader :title="(!predictions) ? 'Child Predictions' : `${predictions.totalChildren} Child Predictions`" />
 
       <div v-if="!predictions">Loading...</div>
 
@@ -40,9 +40,12 @@
         v-if="predictions"
         v-for="index of Math.min(predictions.children.length, limit)"
         :key="predictions.children[index].pid"
-        :prediction="predictions.children[index]"
+        relation="parent"
         :node="node"
-        @dismiss="dismissPrediction(predictions.children[index], index, 'children')"
+        :nodes="nodes"
+        :prediction="predictions.children[index]"
+        @dismiss="dismiss(predictions.children[index], index, 'children')"
+        @annotate="(annotation) => annotate(predictions.synonyms[index], annotation, 'parent')"
       />
     </section>
   </main>

@@ -1,30 +1,34 @@
 import { defineComponent, PropType } from "vue";
-
-// import { AssertionError } from "assert";
-// import { PostEntity } from "@/models/entity/post-entity";
-// import { PostNode } from "@/models/node/post-node";
-// import { getNodeName } from "@/models/node/node";
+import { getNodeName, DeepNode } from "@/models/node";
 
 import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
 import ButtonKnob from "@/components/snippets/ButtonKnob.vue";
 
-import { Prediction } from "@/models/prediction";
+import { Prediction, Annotation } from "@/models/prediction";
 
 export default defineComponent({
   name: "PredictionCard",
 
   components: { ButtonRegular, ButtonKnob },
+  emits: ["dismiss", "annotate"],
 
   props: {
+    relation: { type: String, required: true },
+    node: { type: Object as PropType<DeepNode>, required: true },
+    nodes: { type: Array as PropType<Array<DeepNode>>, required: true },
     prediction: { type: Object as PropType<Prediction>, required: true },
-    // node: { type: Node, required: true },
   },
 
   data() {
     return {
       tokens: undefined as undefined | string[],
       tokenSelections: undefined as undefined | boolean[],
-      mentionInput: "",
+      getNodeName: getNodeName,
+
+      // annotation form
+      selectedPhrase: "",
+      selectedNid: this.node.nid,
+      selectedRelation: this.relation,
     };
   },
 
@@ -38,13 +42,7 @@ export default defineComponent({
       );
     },
     hasAnnotation: function () {
-      return this.mentionInput !== "";
-    },
-  },
-
-  emits: {
-    dismiss() {
-      return true;
+      return this.selectedPhrase !== "";
     },
   },
 
@@ -64,7 +62,7 @@ export default defineComponent({
       handler(tokenSelections: boolean[]) {
         const tokens = this.tokens!;
 
-        this.mentionInput = tokenSelections
+        this.selectedPhrase = tokenSelections
           .map((tokenSelection, index) =>
             tokenSelection ? tokens[index] : null
           )
@@ -75,16 +73,22 @@ export default defineComponent({
   },
 
   methods: {
-    annotate() {
-      const mentionInput = this.$refs.mention as HTMLInputElement;
-      const mention = mentionInput.value;
+    annotate: function () {
+      const annotation: Annotation = {
+        nid: this.selectedNid,
+        relation: this.selectedRelation,
+        phrase: this.selectedPhrase,
+      };
 
-      console.log("annotate!", mention);
-
-      // this.$emit("createNode", postNode);
+      this.$emit("annotate", annotation);
     },
   },
 });
+
+// import { AssertionError } from "assert";
+// import { PostEntity } from "@/models/entity/post-entity";
+// import { PostNode } from "@/models/node/post-node";
+// import { getNodeName } from "@/models/node/node";
 
 /*
 export default defineComponent({

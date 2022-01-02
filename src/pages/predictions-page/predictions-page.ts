@@ -4,10 +4,10 @@ import PredictionCard from "@/components/prediction-card/prediction-card.vue";
 import TreeItem from "@/components/tree-item/tree-item.vue";
 import ColHeader from "@/components/snippets/ColHeader.vue";
 
-import { DeepNode } from "@/models/node";
+import { getNodeName, DeepNode } from "@/models/node";
 import { NodeService } from "@/services/node-service";
 
-import { Prediction, PredictionResponse } from "@/models/prediction";
+import { Prediction, Predictions, Annotation } from "@/models/prediction";
 import { PredictionService } from "@/services/prediction-service";
 
 export default defineComponent({
@@ -21,35 +21,54 @@ export default defineComponent({
 
   data() {
     return {
-      nid: null as number | null,
+      nid: -1,
+      limit: 20,
 
       root: null as DeepNode | null,
       node: null as DeepNode | null,
+      nodes: [] as Array<DeepNode>,
 
-      predictions: null as PredictionResponse | null,
-
-      limit: 20,
+      predictions: null as Predictions | null,
     };
   },
 
   mounted() {
-    this.nid = Number(this.$route.params.node);
-    this.loadRootNode(this.nid);
+    this.initData();
 
     this.$watch(
       () => this.$route.params,
       () => {
-        this.nid = Number(this.$route.params.node);
-        this.loadRootNode(this.nid);
+        this.initData();
       }
     );
   },
 
   methods: {
-    loadRootNode(nid: number): void {
+    initData(): void {
+      this.nid = Number(this.$route.params.node);
+
+      if (this.nid === -1) {
+        console.error("could not read nid from route!");
+      }
+
       NodeService.getNodes().then((roots: DeepNode[]) => {
-        this.findRootNode(roots, nid);
-        this.loadPredictions(nid);
+        // create flat array of nodes -> populates this.nodes
+        // recurses pre-order
+        function recurse(accum: DeepNode[], nodes: DeepNode[]) {
+          nodes.forEach((node) => {
+            accum.push(node);
+            recurse(accum, node.children);
+          });
+        }
+
+        recurse(this.nodes, roots);
+        this.nodes.sort((n1, n2) =>
+          getNodeName(n1) < getNodeName(n2) ? -1 : 1
+        );
+
+        // find and populate the currently active root node
+        this.findRootNode(roots, this.nid);
+        this.loadPredictions(this.nid);
       });
     },
 
@@ -57,7 +76,7 @@ export default defineComponent({
       const limit = 500;
 
       PredictionService.getPredictions(nid, 0, limit).then(
-        (predictionResponse: PredictionResponse) => {
+        (predictionResponse: Predictions) => {
           this.predictions = predictionResponse;
         }
       );
@@ -91,17 +110,58 @@ export default defineComponent({
       return null;
     },
 
-    dismissPrediction(pred: Prediction, index: number, kind: string) {
+    findCollection(relation: string): Prediction[] {
+      if (!new Set(["synonym", "children"]).has(relation)) {
+        console.error("prediction-page.findCollection: unknown", relation);
+        return [];
+      }
+
+      if (this.predictions === null) {
+        console.error("prediction-page.findCollection: no predictions");
+        return [];
+      }
+
+      return relation === "synonym"
+        ? this.predictions.synonyms
+        : this.predictions.children;
+    },
+
+    dismiss(pred: Prediction, index: number, relation: string) {
+      console.log("dismiss", pred, index, relation);
       if (this.predictions === null) return;
-
-      const arr =
-        kind === "synonyms"
-          ? this.predictions.synonyms
-          : this.predictions.children;
-
-      arr.splice(index, 1);
-
+      this.findCollection(relation).splice(index, 1);
       PredictionService.delPrediction(pred.pid);
+    },
+
+    annotate(pred: Prediction, annotation: Annotation, relation: string) {
+      console.log("predictions-page: annotate", pred, annotation);
+
+      // response contains all to-be delete pids
+      PredictionService.annPrediction(pred.pid, annotation).then((res) => {
+        const removed = new Set(res.removed);
+
+        // important: not annotated relation but the source list's one
+        const preds = this.findCollection(relation);
+        if (!preds) {
+          console.error("no predictions?");
+          return;
+        }
+
+        const indexes: number[] = [];
+        preds.forEach((pred, index) => {
+          if (removed.has(pred.pid)) indexes.push(index);
+        });
+
+        // backwards to retain previous indexes
+        while (indexes.length) {
+          const tbd = indexes.pop();
+          if (tbd) {
+            // lol typescript
+            preds.splice(tbd, 1);
+            console.log("removing index", tbd);
+          }
+        }
+      });
     },
 
     /**

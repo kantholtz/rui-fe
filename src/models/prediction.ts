@@ -5,16 +5,25 @@ export enum Relations {
 
 export interface Prediction {
   pid: number;
-  nid: number;
   score: number;
   scoreNorm: number;
   context: string;
   node: Node;
 }
 
-export interface PredictionResponse {
+export interface Predictions {
   totalSynonyms: number;
   totalChildren: number;
   synonyms: Prediction[];
   children: Prediction[];
+}
+
+export interface Annotation {
+  nid: number;
+  relation: string;
+  phrase: string;
+}
+
+export interface AnnotationResponse {
+  removed: number[];
 }
