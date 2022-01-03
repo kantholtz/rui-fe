@@ -1,16 +1,21 @@
 import { defineComponent } from "vue";
 
+import ButtonRegular from "@/components/snippets/ButtonRegular.vue";
 import LoadingOverlay from "@/components/loading-overlay/loading-overlay.vue";
 import UploadWarning from "@/components/upload-warning/upload-warning.vue";
+import ColHeader from "@/components/snippets/ColHeader.vue";
 
+import { Available } from "@/models/upload";
 import { UploadService } from "@/services/upload-service";
 
 export default defineComponent({
   name: "UploadPage",
 
-  components: { LoadingOverlay, UploadWarning },
+  components: { LoadingOverlay, UploadWarning, ColHeader, ButtonRegular },
 
-  emits: ["uploaded"],
+  mounted() {
+    this.loadAvailable();
+  },
 
   data() {
     return {
@@ -20,10 +25,18 @@ export default defineComponent({
       loadingMessages: [] as string[],
       showLoading: false,
       showLoadingTimeout: -1,
+
+      available: null as Available[] | null,
     };
   },
 
   methods: {
+    loadAvailable() {
+      UploadService.getAvailable().then(
+        (res) => (this.available = res.available)
+      );
+    },
+
     startLoading(loadingMessage: string): void {
       this.loadingMessages.push(loadingMessage);
 
@@ -51,20 +64,29 @@ export default defineComponent({
     },
 
     uploadAndRedirect(): void {
-      const form = this.$refs.form as HTMLFormElement;
+      const message = "Uploading data...";
 
+      const form = this.$refs.form as HTMLFormElement;
       const formData = new FormData(form);
 
-      this.startLoading("Uploading data...");
+      this.startLoading(message);
       UploadService.putUpload(formData).then(() => {
+        this.stopLoading(message);
         this.$router.push("/taxonomy");
-
-        this.stopLoading("Uploading data...");
       });
 
       this.showUploadWarning = false;
-
       form.reset();
+    },
+
+    loadAndRedirect(name: string): void {
+      const message = `Initializing ${name}`;
+      this.startLoading(message);
+
+      UploadService.postInit(name).then(() => {
+        this.stopLoading(message);
+        this.$router.push("/taxonomy");
+      });
     },
   },
 });

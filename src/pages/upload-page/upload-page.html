@@ -9,25 +9,59 @@
   @overwrite="uploadAndRedirect"
 />
 
-<div class="bg-white rounded-lg w-96 mx-auto px-10 py-5">
-  <form ref="form" @submit.prevent="showUploadWarning = true">
-    <label class="text-lg" for="symptaxUploadZip">Symptax Upload ZIP</label>
+<div class="container mx-auto center">
+  <main class="grid grid-cols-3 gap-4">
+    <div></div>
+    <div>
+      <!-- middle column -->
 
-    <input
-      id="symptaxUploadZip"
-      class="my-5"
-      @change="isFileSelected = true"
-      type="file"
-      name="symptaxUploadZip"
-    />
+      <ColHeader title="Select" />
 
-    <div class="text-center">
-      <input
-        class="px-3 py-1 rounded-lg font-bold transition-colors duration-300 bg-sky-400 text-white hover:bg-sky-700"
-        type="submit"
-        value="Upload"
-        :disabled="!isFileSelected"
-      />
+      <div class="p-5 mb-10 bg-white border border-gray-300 rounded-lg">
+        <div v-if="!available">Loading...</div>
+        <div v-if="available && !available.length">No files available.</div>
+
+        <template v-if="available" v-for="file in available" :key="file">
+          <div class="p-5">
+            <ButtonRegular
+              :label="file.name"
+              kind="sky"
+              @click="loadAndRedirect(file.name)"
+            />
+
+            <div class="text-sm pt-3">
+              Modified <span class="font-bold">{{file.created}}</span>
+              <span class="text-gray-500 px-5">{{file.size}}MB</span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <ColHeader title="Upload" />
+
+      <div class="p-5 mb-10 bg-white border border-gray-300 rounded-lg">
+        <form ref="form" @submit.prevent="showUploadWarning = true">
+          <label class="text-lg mr-5" for="zip">Upload ZIP</label>
+
+          <input
+            id="zip"
+            class="my-5"
+            @change="isFileSelected = true"
+            type="file"
+            name="zip"
+          />
+
+          <input
+            class="border p-2"
+            type="submit"
+            value="Upload"
+            :disabled="!isFileSelected"
+          />
+        </form>
+      </div>
+
+      <!-- /middle column -->
     </div>
-  </form>
+    <div></div>
+  </main>
 </div>
