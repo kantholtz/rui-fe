@@ -133,7 +133,12 @@ export default defineComponent({
       PredictionService.delPrediction(pred.pid);
     },
 
-    annotate(pred: Prediction, annotation: Annotation, relation: string) {
+    annotate(
+      pred: Prediction,
+      annotation: Annotation,
+      relation: string,
+      callback: (x: number) => void
+    ) {
       console.log("predictions-page: annotate", pred, annotation);
 
       // response contains all to-be delete pids
@@ -153,84 +158,21 @@ export default defineComponent({
         });
 
         // backwards to retain previous indexes
-        while (indexes.length) {
+        while (indexes.length > 1) {
           const tbd = indexes.pop();
+          // lol typescript
           if (tbd) {
-            // lol typescript
             preds.splice(tbd, 1);
             console.log("removing index", tbd);
           }
         }
+
+        callback(res.removed.length);
       });
     },
 
-    /**
-     * Dismiss the prediction with the specified candidate and reload the predictions.
-     *
-     * Expects nid to be set.
-     */
-    // dismissPredictions(candidate: string): void {
-    //   const nid = this.nid!;
-
-    //   const predictionPatch: PredictionPatch = { dismissed: true };
-
-    //   this.startLoading("Updating prediction...");
-    //   PredictionService.patchPrediction(candidate, predictionPatch).then(() => {
-    //     this.loadPredictions(nid, this.offset, 3);
-    //     this.stopLoading("Updating prediction...");
-    //   });
-    // },
-
-    /**
-     * Post entity via EntityService and reload the taxonomy. Also, dismiss the
-     * annotated prediction and reload the predictions.
-     *
-     * Expects nid and predictions to be set.
-     */
-    // createEntityAndDismissPrediction(index: number, postEntity: PostEntity) {
-    //   const nid = this.nid!;
-    //   const predictions = this.predictions!;
-
-    //   const candidate = predictions[index].candidate;
-    //   const predictionPatch: PredictionPatch = { dismissed: true };
-
-    //   this.startLoading("Updating prediction...");
-    //   PredictionService.patchPrediction(candidate, predictionPatch).then(() => {
-    //     this.startLoading("Creating entity...");
-    //     EntityService.postEntity(postEntity).then(() => {
-    //       this.loadRootNode(nid);
-
-    //       this.stopLoading("Creating entity...");
-    //     });
-
-    //     this.stopLoading("Updating prediction...");
-    //   });
-    // },
-
-    /**
-     * Post node via NodeService and reload the taxonomy. Also, dismiss the
-     * annotated prediction and reload the predictions.
-     *
-     * Expects nid and predictions to be set.
-     */
-    // createNodeAndDismissPrediction(index: number, postNode: PostNode) {
-    //   const nid = this.nid!;
-    //   const predictions = this.predictions!;
-
-    //   const candidate = predictions[index].candidate;
-    //   const predictionPatch: PredictionPatch = { dismissed: true };
-
-    //   this.startLoading("Updating prediction...");
-    //   PredictionService.patchPrediction(candidate, predictionPatch).then(() => {
-    //     this.startLoading("Creating node...");
-    //     NodeService.postNode(postNode).then(() => {
-    //       this.loadRootNode(nid);
-
-    //       this.stopLoading("Creating node...");
-    //     });
-
-    //     this.stopLoading("Updating prediction...");
-    //   });
-    // },
+    close(index: number, relation: string) {
+      this.findCollection(relation).splice(index, 1);
+    },
   },
 });

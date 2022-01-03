@@ -14,39 +14,51 @@
     </section>
 
     <section>
-      <ColHeader :title="(!predictions) ? 'Synonym Predictions' : `${predictions.totalSynonyms} Synonym Predictions`" />
+      <ColHeader
+        :title="(!predictions) ? 'Synonym Predictions' : `${predictions.totalSynonyms} Synonym Predictions`"
+      />
 
       <div v-if="!predictions">Loading...</div>
 
-      <PredictionCard
+      <template
         v-if="predictions"
         v-for="index of Math.min(predictions.synonyms.length, limit)"
         :key="predictions.synonyms[index].pid"
-        relation="synonym"
-        :node="node"
-        :nodes="nodes"
-        :prediction="predictions.synonyms[index]"
-        @dismiss="dismiss(predictions.synonyms[index], index, 'synonym')"
-        @annotate="(annotation) => annotate(predictions.synonyms[index], annotation, 'synonym')"
-      />
+      >
+        <PredictionCard
+          relation="synonym"
+          :node="node"
+          :nodes="nodes"
+          :prediction="predictions.synonyms[index]"
+          @dismiss="dismiss(predictions.synonyms[index], index, 'synonym')"
+          @annotate="(annotation, callback) => annotate(predictions.synonyms[index], annotation, 'synonym', callback)"
+          @close="close(index, 'synonym')"
+        />
+      </template>
     </section>
 
     <section>
-      <ColHeader :title="(!predictions) ? 'Child Predictions' : `${predictions.totalChildren} Child Predictions`" />
+      <ColHeader
+        :title="(!predictions) ? 'Child Predictions' : `${predictions.totalChildren} Child Predictions`"
+      />
 
       <div v-if="!predictions">Loading...</div>
 
-      <PredictionCard
+      <template
         v-if="predictions"
         v-for="index of Math.min(predictions.children.length, limit)"
         :key="predictions.children[index].pid"
-        relation="parent"
-        :node="node"
-        :nodes="nodes"
-        :prediction="predictions.children[index]"
-        @dismiss="dismiss(predictions.children[index], index, 'children')"
-        @annotate="(annotation) => annotate(predictions.synonyms[index], annotation, 'parent')"
-      />
+      >
+        <PredictionCard
+          relation="parent"
+          :node="node"
+          :nodes="nodes"
+          :prediction="predictions.children[index]"
+          @dismiss="dismiss(predictions.children[index], index, 'children')"
+          @annotate="(annotation, callback) => annotate(predictions.synonyms[index], annotation, 'children', callback)"
+          @close="close(index, 'children')"
+        />
+      </template>
     </section>
   </main>
 </div>

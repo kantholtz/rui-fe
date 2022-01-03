@@ -10,7 +10,7 @@ export default defineComponent({
   name: "PredictionCard",
 
   components: { ButtonRegular, ButtonKnob },
-  emits: ["dismiss", "annotate"],
+  emits: ["dismiss", "annotate", "close"],
 
   props: {
     relation: { type: String, required: true },
@@ -29,6 +29,12 @@ export default defineComponent({
       selectedPhrase: "",
       selectedNid: this.node.nid,
       selectedRelation: this.relation,
+
+      annotation: null as Annotation | null,
+
+      // state
+      submitted: false,
+      duplicates: null as number | null,
     };
   },
 
@@ -80,173 +86,12 @@ export default defineComponent({
         phrase: this.selectedPhrase,
       };
 
-      this.$emit("annotate", annotation);
+      this.annotation = annotation;
+      this.submitted = true;
+
+      this.$emit("annotate", annotation, (duplicates: number) => {
+        this.duplicates = duplicates;
+      });
     },
   },
 });
-
-// import { AssertionError } from "assert";
-// import { PostEntity } from "@/models/entity/post-entity";
-// import { PostNode } from "@/models/node/post-node";
-// import { getNodeName } from "@/models/node/node";
-
-/*
-export default defineComponent({
-  data() {
-    return {
-      tokens: undefined as undefined | string[],
-      tokenSelections: undefined as undefined | boolean[],
-
-      mentionInput: "",
-
-      selectedPrediction: undefined as
-        | undefined
-        | {
-            type: PredictionType;
-            index: number;
-          },
-
-      getNodeName,
-      PredictionType,
-    };
-  },
-
-  emits: {
-    dismiss() {
-      return true;
-    },
-
-    createEntity(postEntity: PostEntity) {
-      return true;
-    },
-
-    createNode(postNode: PostNode) {
-      return true;
-    },
-  },
-
-  methods: {
-    /**
-     * Emit "createEntity" event if synonym prediction is selected or "createNode"
-     * event if child prediction is selected.
-     *
-     * Must only be called when a prediction is selected.
-     *
-    annotate() {
-      const selectedPrediction = this.selectedPrediction!;
-
-      const mentionInput = this.$refs.mention as HTMLInputElement;
-      const mention = mentionInput.value;
-
-      if (selectedPrediction.type === PredictionType.SYNONYM) {
-        const synonyms = this.predictions.synonyms;
-        const selectedSynonymPrediction: Prediction =
-          synonyms[selectedPrediction.index];
-        const selectedNode = selectedSynonymPrediction.node;
-
-        const postEntity: PostEntity = {
-          nid: selectedNode.nid,
-          name: mention,
-        };
-
-        this.$emit("createEntity", postEntity);
-      } else if (selectedPrediction.type === PredictionType.CHILD) {
-        const children = this.predictions.children;
-        const selectedParentPrediction: Prediction =
-          children[selectedPrediction.index];
-        const selectedNode = selectedParentPrediction.node;
-
-        const postNode: PostNode = {
-          parentId: selectedNode.nid,
-          entities: [{ name: mention }],
-        };
-
-        this.$emit("createNode", postNode);
-      }
-    },
-
-    isPredictionSelected(type: PredictionType, index: number): boolean {
-      const selectedPrediction = this.selectedPrediction!;
-
-      return (
-        type === selectedPrediction.type && index === selectedPrediction.index
-      );
-    },
-  },
-
-  name: "PredictionCard",
-
-  props: {
-    // predictions: {
-    //   type: Object as PropType<Predictions>,
-    //   required: true,
-    // },
-
-    currentNodeId: {
-      type: Number,
-      required: true,
-    },
-  },
-
-  watch: {
-    predictions: {
-      immediate: true,
-      handler(predictions: Predictions) {
-        this.tokens = predictions.candidate.split(" ");
-        this.tokenSelections = new Array<boolean>(this.tokens.length).fill(
-          false
-        );
-      },
-    },
-
-    tokenSelections: {
-      deep: true,
-      handler(tokenSelections: boolean[]) {
-        const tokens = this.tokens!;
-
-        this.mentionInput = tokenSelections
-          .map((tokenSelection, index) =>
-            tokenSelection ? tokens[index] : null
-          )
-          .filter((token) => token !== null)
-          .join(" ");
-      },
-    },
-
-    /**
-     * Select the synonym prediction for the current node. If there is none, select
-     * the child prediction for the current node. There must be one or both of these.
-     *
-    currentNodeId: {
-      immediate: true,
-      handler(currentNodeId: number) {
-        console.log("hello!");
-        console.log(this.predictions);
-
-        const synonyms = this.predictions.synonyms;
-        for (let i = 0; i < synonyms.length; i++) {
-          const synonymPrediction = synonyms[i];
-          if (synonymPrediction.node.nid === currentNodeId) {
-            this.selectedPrediction = {
-              type: PredictionType.SYNONYM,
-              index: i,
-            };
-            return;
-          }
-        }
-
-        const children = this.predictions.children;
-        for (let i = 0; i < children.length; i++) {
-          const parentPrediction = children[i];
-          if (parentPrediction.node.nid === currentNodeId) {
-            this.selectedPrediction = { type: PredictionType.CHILD, index: i };
-            return;
-          }
-        }
-
-        throw "There is neither a synonym nor a parent prediction about the current node.";
-      },
-    },
-  },
-});
-*/
