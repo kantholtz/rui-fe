@@ -27,3 +27,7 @@ export interface Annotation {
 export interface AnnotationResponse {
   removed: number[];
 }
+
+export interface FilterResponse {
+  removed: number[];
+}

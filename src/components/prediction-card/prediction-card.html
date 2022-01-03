@@ -1,20 +1,49 @@
 <div class="border border-gray-300 rounded-lg bg-white p-5 mb-5">
-  <template v-if="submitted">
+  <!-- submitted filter -->
+
+  <template v-if="submittedFilter">
+    <div>
+      <div>
+        <ButtonKnob
+          class="mr-2"
+          label="x"
+          kind="pink"
+          @click="$emit('close')"
+        />
+        <span v-if="!filtered"
+          >Filtering
+          <span class="font-bold">"{{ selectedPhrase }}"</span>...</span
+        >
+        <span v-if="filtered"
+          >Filtered <span class="font-bold">"{{ selectedPhrase }}"</span></span
+        >
+      </div>
+      <div v-if="filtered" class="font-bold pt-3">
+        ✔ Removed {{ filtered }} prediction(s)
+      </div>
+    </div>
+  </template>
+
+  <!-- submitted annotation -->
+
+  <template v-if="submittedAnnotation">
     <div>
       <ButtonKnob class="mr-2" label="x" kind="pink" @click="$emit('close')" />
       <span v-if="!duplicates"
         >Submitting Annotation
-        <span class="font-bold">"{{ annotation.phrase }}"</span>...</span
+        <span class="font-bold">"{{ selectedPhrase }}"</span>...</span
       >
       <span v-if="duplicates"
         >Submitted Annotation
-        <span class="font-bold">"{{ annotation.phrase }}"</span></span
+        <span class="font-bold">"{{ selectedPhrase }}"</span></span
       >
     </div>
     <div v-if="duplicates" class="font-bold pt-3">
-      ✔ Matched and removed {{ duplicates }} duplicates
+      ✔ Matched and removed {{ duplicates }} duplicate(s)
     </div>
   </template>
+
+  <!-- annotation form -->
 
   <template v-if="!submitted">
     <div>
@@ -52,7 +81,12 @@
           @input="userEditsMentionInput = true"
         />
 
-        <ButtonRegular label="Filter" :enabled="hasAnnotation" kind="orange" />
+        <ButtonRegular
+          label="Filter"
+          :enabled="hasAnnotation"
+          kind="orange"
+          @click="filter"
+        />
       </div>
 
       <div class="flex gap-3 border-t-1 border-grey-600 mb-2">

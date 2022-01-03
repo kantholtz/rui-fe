@@ -76,8 +76,29 @@ export default defineComponent({
       const limit = 500;
 
       PredictionService.getPredictions(nid, 0, limit).then(
-        (predictionResponse: Predictions) => {
-          this.predictions = predictionResponse;
+        (preds: Predictions) => {
+          this.predictions = preds;
+        }
+      );
+    },
+
+    updatePredictionCounts() {
+      if (!this.node) {
+        console.error("predictions-page updatePredictionCounts(): no node set");
+        return;
+      }
+
+      PredictionService.getPredictions(this.node.nid, 0, 0).then(
+        (preds: Predictions) => {
+          if (!this.predictions) {
+            console.error(
+              "predictions-page updatePredictionCounts(): no predictions"
+            );
+            return;
+          }
+
+          this.predictions.totalChildren = preds.totalChildren;
+          this.predictions.totalSynonyms = preds.totalSynonyms;
         }
       );
     },
@@ -131,20 +152,74 @@ export default defineComponent({
       if (this.predictions === null) return;
       this.findCollection(relation).splice(index, 1);
       PredictionService.delPrediction(pred.pid);
+      this.updatePredictionCounts();
+    },
+
+    removePredictions(preds: Prediction[], pids: number[]) {
+      const removed = new Set(pids);
+
+      const indexes: number[] = [];
+      preds.forEach((pred, index) => {
+        if (removed.has(pred.pid)) indexes.push(index);
+      });
+
+      // backwards to retain previous indexes
+      while (indexes.length > 1) {
+        const tbd = indexes.pop();
+        // lol typescript
+        if (tbd) {
+          preds.splice(tbd, 1);
+          console.log("removing index", tbd);
+        }
+      }
+
+      this.updatePredictionCounts();
     },
 
     annotate(
       pred: Prediction,
       annotation: Annotation,
       relation: string,
-      callback: (x: number) => void
+      callback: (removed: number) => void
     ) {
       console.log("predictions-page: annotate", pred, annotation);
 
       // response contains all to-be delete pids
       PredictionService.annPrediction(pred.pid, annotation).then((res) => {
-        const removed = new Set(res.removed);
+        // important: not annotated relation but the source list's one
+        const preds = this.findCollection(relation);
+        if (!preds) {
+          console.error("predictions-page annotate(): no predictions?");
+          return;
+        }
 
+        this.removePredictions(preds, res.removed);
+        callback(res.removed.length);
+      });
+    },
+
+    close(index: number, relation: string) {
+      this.findCollection(relation).splice(index, 1);
+    },
+
+    filter(
+      pred: Prediction,
+      relation: string,
+      phrase: string,
+      callback: (filtered: number) => void
+    ) {
+      console.log("predictions-page: filter", pred, phrase);
+      if (this.node == null) {
+        console.error("predictions-page filter(): no node set");
+        return;
+      }
+
+      PredictionService.filterPrediction(
+        pred.pid,
+        this.node.nid,
+        relation,
+        phrase
+      ).then((res) => {
         // important: not annotated relation but the source list's one
         const preds = this.findCollection(relation);
         if (!preds) {
@@ -152,27 +227,9 @@ export default defineComponent({
           return;
         }
 
-        const indexes: number[] = [];
-        preds.forEach((pred, index) => {
-          if (removed.has(pred.pid)) indexes.push(index);
-        });
-
-        // backwards to retain previous indexes
-        while (indexes.length > 1) {
-          const tbd = indexes.pop();
-          // lol typescript
-          if (tbd) {
-            preds.splice(tbd, 1);
-            console.log("removing index", tbd);
-          }
-        }
-
+        this.removePredictions(preds, res.removed);
         callback(res.removed.length);
       });
-    },
-
-    close(index: number, relation: string) {
-      this.findCollection(relation).splice(index, 1);
     },
   },
 });

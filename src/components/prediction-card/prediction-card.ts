@@ -10,7 +10,7 @@ export default defineComponent({
   name: "PredictionCard",
 
   components: { ButtonRegular, ButtonKnob },
-  emits: ["dismiss", "annotate", "close"],
+  emits: ["dismiss", "annotate", "close", "filter"],
 
   props: {
     relation: { type: String, required: true },
@@ -30,11 +30,11 @@ export default defineComponent({
       selectedNid: this.node.nid,
       selectedRelation: this.relation,
 
-      annotation: null as Annotation | null,
-
       // state
-      submitted: false,
+      submittedAnnotation: false,
+      submittedFilter: false,
       duplicates: null as number | null,
+      filtered: null as number | null,
     };
   },
 
@@ -49,6 +49,9 @@ export default defineComponent({
     },
     hasAnnotation: function () {
       return this.selectedPhrase !== "";
+    },
+    submitted: function () {
+      return this.submittedAnnotation || this.submittedFilter;
     },
   },
 
@@ -86,11 +89,16 @@ export default defineComponent({
         phrase: this.selectedPhrase,
       };
 
-      this.annotation = annotation;
-      this.submitted = true;
-
+      this.submittedAnnotation = true;
       this.$emit("annotate", annotation, (duplicates: number) => {
         this.duplicates = duplicates;
+      });
+    },
+
+    filter: function () {
+      this.submittedFilter = true;
+      this.$emit("filter", this.selectedPhrase, (filtered: number) => {
+        this.filtered = filtered;
       });
     },
   },

@@ -2,6 +2,7 @@ import {
   Predictions,
   Annotation,
   AnnotationResponse,
+  FilterResponse,
 } from "@/models/prediction";
 
 export const PredictionService = {
@@ -27,9 +28,7 @@ export const PredictionService = {
 
     return fetch(url, {
       method: "DELETE",
-    })
-      .then((response) => console.log(response))
-      .catch((error) => console.error(error));
+    }).catch((error) => console.error(error));
   },
 
   // --
@@ -46,6 +45,32 @@ export const PredictionService = {
 
     return fetch(
       `${process.env.VUE_APP_API_URL}/predictions/${pid}/annotate`,
+      fetchOptions
+    )
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+
+  filterPrediction(
+    pid: number,
+    nid: number,
+    relation: string,
+    phrase: string
+  ): Promise<FilterResponse> {
+    const data = {
+      nid: nid,
+      relation: relation,
+      phrase: phrase,
+    };
+
+    const fetchOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    };
+
+    return fetch(
+      `${process.env.VUE_APP_API_URL}/predictions/${pid}/filter`,
       fetchOptions
     )
       .then((response) => response.json())
