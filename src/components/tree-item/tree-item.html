@@ -27,11 +27,7 @@
 
   <!-- Node name -->
 
-  <a
-    :class="{'cursor-pointer': selectable}"
-    :class="{'font-bold': node === selectedNode, selectable}"
-    @click="selectable && $emit('select', node)"
-  >
+  <a :class="getNodeClasses()" @click="selectable && $emit('select', node)">
     {{ getNodeName(node) }}
   </a>
 

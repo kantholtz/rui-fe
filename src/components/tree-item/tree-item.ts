@@ -61,6 +61,20 @@ export default defineComponent({
   },
 
   methods: {
+    getNodeClasses() {
+      const classes: string[] = [];
+
+      if (this.selectable) {
+        classes.push("cursor-pointer");
+      }
+
+      if (this.selectedNode === this.node && this.selectable) {
+        classes.push("font-bold");
+      }
+
+      return classes;
+    },
+
     containsNode(checkNode: DeepNode, searchNode: DeepNode): boolean {
       for (const child of checkNode.children) {
         if (child === searchNode) {
