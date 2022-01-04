@@ -97,8 +97,8 @@ export default defineComponent({
             return;
           }
 
-          this.predictions.totalChildren = preds.totalChildren;
           this.predictions.totalSynonyms = preds.totalSynonyms;
+          this.predictions.totalChildren = preds.totalChildren;
         }
       );
     },
@@ -132,7 +132,7 @@ export default defineComponent({
     },
 
     findCollection(relation: string): Prediction[] {
-      if (!new Set(["synonym", "children"]).has(relation)) {
+      if (!new Set(["synonym", "children", "parent"]).has(relation)) {
         console.error("prediction-page.findCollection: unknown", relation);
         return [];
       }

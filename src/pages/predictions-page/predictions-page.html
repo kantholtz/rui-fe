@@ -23,17 +23,17 @@
       <template
         v-if="predictions"
         v-for="index of Math.min(predictions.synonyms.length, limit)"
-        :key="predictions.synonyms[index].pid"
+        :key="predictions.synonyms[index-1].pid"
       >
         <PredictionCard
           relation="synonym"
           :node="node"
           :nodes="nodes"
-          :prediction="predictions.synonyms[index]"
-          @dismiss="dismiss(predictions.synonyms[index], index, 'synonym')"
-          @annotate="(annotation, callback) => annotate(predictions.synonyms[index], annotation, 'synonym', callback)"
-          @close="close(index, 'synonym')"
-          @filter="(phrase, callback) => filter(predictions.synonyms[index], 'synonym', phrase, callback)"
+          :prediction="predictions.synonyms[index-1]"
+          @dismiss="dismiss(predictions.synonyms[index-1], index-1, 'synonym')"
+          @annotate="(annotation, callback) => annotate(predictions.synonyms[index-1], annotation, 'synonym', callback)"
+          @close="close(index-1, 'synonym')"
+          @filter="(phrase, callback) => filter(predictions.synonyms[index-1], 'synonym', phrase, callback)"
         />
       </template>
     </section>
@@ -48,17 +48,17 @@
       <template
         v-if="predictions"
         v-for="index of Math.min(predictions.children.length, limit)"
-        :key="predictions.children[index].pid"
+        :key="predictions.children[index-1].pid"
       >
         <PredictionCard
           relation="parent"
           :node="node"
           :nodes="nodes"
-          :prediction="predictions.children[index]"
-          @dismiss="dismiss(predictions.children[index], index, 'children')"
-          @annotate="(annotation, callback) => annotate(predictions.children[index], annotation, 'children', callback)"
-          @close="close(index, 'children')"
-          @filter="(phrase, callback) => filter(predictions.children[index], 'children', phrase, callback)"
+          :prediction="predictions.children[index-1]"
+          @dismiss="dismiss(predictions.children[index-1], index-1, 'parent')"
+          @annotate="(annotation, callback) => annotate(predictions.children[index-1], annotation, 'parent', callback)"
+          @close="close(index-1, 'parent')"
+          @filter="(phrase, callback) => filter(predictions.children[index-1], 'parent', phrase, callback)"
         />
       </template>
     </section>

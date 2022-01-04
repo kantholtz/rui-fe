@@ -25,6 +25,7 @@ export default defineComponent({
 
   data() {
     return {
+      loading: false,
       rootNodes: [] as DeepNode[],
       selectedNode: null as DeepNode | null,
       creatingNewNode: false,
@@ -54,8 +55,10 @@ export default defineComponent({
 
   methods: {
     loadTaxonomy(): void {
+      this.loading = true;
       NodeService.getNodes().then((rootNodes: DeepNode[]) => {
         this.rootNodes = rootNodes;
+        this.loading = false;
       });
     },
 

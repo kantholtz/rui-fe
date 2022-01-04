@@ -1,5 +1,7 @@
 <div>
-  <div v-if="!rootNodes.length">Loading...</div>
+  <div v-if="loading">Loading...</div>
+
+  <div v-if="!loading && !rootNodes.length">No nodes so far</div>
 
   <ul>
     <TreeItem

@@ -1,4 +1,4 @@
-import { Available, AvailableResponse } from "@/models/upload";
+import { AvailableResponse } from "@/models/upload";
 
 export const UploadService = {
   putUpload(formData: FormData): Promise<void | Response> {
@@ -18,7 +18,7 @@ export const UploadService = {
       .catch((error) => console.error(error));
   },
 
-  postInit(name: string) {
+  postInit(name: string): Promise<void | Response> {
     const fetchOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -5,6 +5,7 @@
       <Taxonomy
         :rootNodes="rootNodes"
         :selectedNode="selectedNode"
+        :loading="loading"
         @select="selectNode($event)"
         @createNode="showCreateRootNode"
       />

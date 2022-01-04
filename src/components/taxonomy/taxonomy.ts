@@ -10,6 +10,8 @@ export default defineComponent({
   components: { TreeItem, ButtonRegular },
 
   props: {
+    loading: { type: Boolean, required: true },
+
     rootNodes: {
       type: Array as PropType<Array<DeepNode>>,
       required: true,
