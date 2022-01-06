@@ -29,6 +29,7 @@ export default defineComponent({
       selectedPhrase: "",
       selectedNid: this.node.nid,
       selectedRelation: this.relation,
+      selectedSpecific: false,
 
       // state
       submittedAnnotation: false,
@@ -88,6 +89,9 @@ export default defineComponent({
         nid: this.selectedNid,
         relation: this.selectedRelation,
         phrase: this.selectedPhrase,
+        predictedNid: this.node.nid,
+        predictedRelation: this.relation,
+        specific: this.selectedSpecific,
       };
 
       this.submittedAnnotation = true;

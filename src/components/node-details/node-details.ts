@@ -66,6 +66,8 @@ export default defineComponent({
       deepNodeMatches: null as number | null,
       totalSynonyms: null as number | null,
       totalChildren: null as number | null,
+
+      entityName: "",
     };
   },
 
@@ -79,18 +81,13 @@ export default defineComponent({
     },
 
     createEntity(event: Event) {
-      const node = this.node!;
-
-      const input = event.target as HTMLInputElement;
-
       const postEntity: PostEntity = {
-        nid: node.nid,
-        name: input.value,
+        nid: this.node!.nid,
+        name: this.entityName,
       };
 
       this.$emit("createEntity", postEntity);
-
-      input.value = "";
+      this.entityName = "";
     },
 
     deleteEntity(eid: number): void {

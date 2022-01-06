@@ -61,12 +61,18 @@ export default defineComponent({
   methods: {
     initData(): void {
       this.nid = Number(this.$route.params.node);
-      this.loadNodes().then(this.loadPredictions);
+      this.loadNodes()
+        .then(this.loadPredictions)
+        .catch((err) => console.error(`catched error in initData: ${err}`));
     },
 
     loadPredictions(): Promise<void | Predictions> {
       const nid = this.nid;
       const limit = 500;
+
+      if (isNaN(nid)) {
+        return Promise.reject("this.nid is NaN");
+      }
 
       return PredictionService.getPredictions(nid, 0, limit).then(
         (preds: Predictions) => {
@@ -114,6 +120,7 @@ export default defineComponent({
         return;
       }
 
+      console.log(">>> load predictions (updatePredictionCounts)");
       PredictionService.getPredictions(this.node.nid, 0, 0).then(
         (preds: Predictions) => {
           if (!this.predictions) {
