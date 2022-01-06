@@ -29,7 +29,7 @@
     <h3 class="text-lg mb-3">Phrases ({{ node.entities.length }})</h3>
     <ul class="pl-5 mb-5">
       <li v-for="entity of node.entities" :key="entity.eid" class="mb-2">
-        <ButtonKnob @click="deleteEntity(entity.eid)" kind="pink" label="x" />
+        <ButtonKnob @click="deleteEntity(entity.eid)" :enabled="node.entities.length > 1" kind="pink" label="x" />
 
         {{ entity.name }}
 

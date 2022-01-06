@@ -1,15 +1,30 @@
 <div class="container mx-auto center">
+  <h1 class="text-2xl text-center mb-10 font-bold">{{ title }}</h1>
+
   <main class="grid grid-cols-3 gap-4">
     <section>
       <ColHeader title="Related Symptoms" />
 
-      <ul>
+      <ul class="mb-10">
         <TreeItem
-          v-if="root"
-          :node="root"
+          v-if="node"
+          :node="node"
           :selectedNode="node"
           :selectable="false"
         />
+      </ul>
+
+      <ColHeader title="Other Symptoms" />
+
+      <ul>
+        <template v-for="node in roots">
+          <TreeItem
+            v-if="node"
+            :node="node"
+            :selectedNode="node"
+            :selectable="false"
+          />
+        </template>
       </ul>
     </section>
 
@@ -18,22 +33,22 @@
         :title="(!predictions) ? 'Synonym Predictions' : `${predictions.totalSynonyms} Synonym Predictions`"
       />
 
-      <div v-if="!predictions">Loading...</div>
+      <div v-if="isLoading">Loading...</div>
 
       <template
-        v-if="predictions"
-        v-for="index of Math.min(predictions.synonyms.length, limit)"
-        :key="predictions.synonyms[index-1].pid"
+        v-if="!isLoading"
+        v-for="prediction of predictions.synonyms"
+        :key="prediction.pid"
       >
         <PredictionCard
           relation="synonym"
           :node="node"
           :nodes="nodes"
-          :prediction="predictions.synonyms[index-1]"
-          @dismiss="dismiss(predictions.synonyms[index-1], index-1, 'synonym')"
-          @annotate="(annotation, callback) => annotate(predictions.synonyms[index-1], annotation, 'synonym', callback)"
-          @close="close(index-1, 'synonym')"
-          @filter="(phrase, callback) => filter(predictions.synonyms[index-1], 'synonym', phrase, callback)"
+          :prediction="prediction"
+          @dismiss="dismiss(prediction, 'synonym')"
+          @annotate="(annotation, callback) => annotate(prediction, annotation, 'synonym', callback)"
+          @close="close(prediction, 'synonym')"
+          @filter="(phrase, callback) => filter(prediction, 'synonym', phrase, callback)"
         />
       </template>
     </section>
@@ -43,22 +58,22 @@
         :title="(!predictions) ? 'Child Predictions' : `${predictions.totalChildren} Child Predictions`"
       />
 
-      <div v-if="!predictions">Loading...</div>
+      <div v-if="isLoading">Loading...</div>
 
       <template
-        v-if="predictions"
-        v-for="index of Math.min(predictions.children.length, limit)"
-        :key="predictions.children[index-1].pid"
+        v-if="!isLoading"
+        v-for="prediction of predictions.children"
+        :key="prediction.pid"
       >
         <PredictionCard
           relation="parent"
           :node="node"
           :nodes="nodes"
-          :prediction="predictions.children[index-1]"
-          @dismiss="dismiss(predictions.children[index-1], index-1, 'parent')"
-          @annotate="(annotation, callback) => annotate(predictions.children[index-1], annotation, 'parent', callback)"
-          @close="close(index-1, 'parent')"
-          @filter="(phrase, callback) => filter(predictions.children[index-1], 'parent', phrase, callback)"
+          :prediction="prediction"
+          @dismiss="dismiss(prediction, 'parent')"
+          @annotate="(annotation, callback) => annotate(prediction, annotation, 'parent', callback)"
+          @close="close(prediction, 'parent')"
+          @filter="(phrase, callback) => filter(prediction, 'parent', phrase, callback)"
         />
       </template>
     </section>

@@ -1,4 +1,4 @@
-import { defineComponent } from "vue";
+import { defineComponent, reactive } from "vue";
 
 import PredictionCard from "@/components/prediction-card/prediction-card.vue";
 import TreeItem from "@/components/tree-item/tree-item.vue";
@@ -24,11 +24,18 @@ export default defineComponent({
       nid: -1,
       limit: 20,
 
-      root: null as DeepNode | null,
       node: null as DeepNode | null,
       nodes: [] as Array<DeepNode>,
+      roots: [] as Array<DeepNode>,
 
-      predictions: null as Predictions | null,
+      isLoading: true,
+
+      predictions: reactive({
+        totalSynonyms: 0,
+        totalChildren: 0,
+        synonyms: [] as Prediction[],
+        children: [] as Prediction[],
+      }),
     };
   },
 
@@ -43,43 +50,62 @@ export default defineComponent({
     );
   },
 
+  computed: {
+    title: function (): string {
+      return this.node === null
+        ? "Predictions"
+        : `Predictions for "${getNodeName(this.node)}"`;
+    },
+  },
+
   methods: {
     initData(): void {
       this.nid = Number(this.$route.params.node);
+      this.loadNodes().then(this.loadPredictions);
+    },
 
+    loadPredictions(): Promise<void | Predictions> {
+      const nid = this.nid;
+      const limit = 500;
+
+      return PredictionService.getPredictions(nid, 0, limit).then(
+        (preds: Predictions) => {
+          this.predictions.totalChildren = preds.totalChildren;
+          this.predictions.totalSynonyms = preds.totalSynonyms;
+          this.predictions.synonyms = preds.synonyms;
+          this.predictions.children = preds.children;
+
+          this.isLoading = false;
+        }
+      );
+    },
+
+    loadNodes() {
       if (this.nid === -1) {
         console.error("could not read nid from route!");
       }
-
-      NodeService.getNodes().then((roots: DeepNode[]) => {
+      return NodeService.getNodes().then((roots: DeepNode[]) => {
         // create flat array of nodes -> populates this.nodes
         // recurses pre-order
-        function recurse(accum: DeepNode[], nodes: DeepNode[]) {
+        function flatten(accum: DeepNode[], nodes: DeepNode[]) {
           nodes.forEach((node) => {
             accum.push(node);
-            recurse(accum, node.children);
+            flatten(accum, node.children);
           });
+
+          return accum;
         }
 
-        recurse(this.nodes, roots);
-        this.nodes.sort((n1, n2) =>
-          getNodeName(n1) < getNodeName(n2) ? -1 : 1
-        );
+        const nodes = flatten([], roots);
+        const fn = (n: DeepNode) => getNodeName(n).toLowerCase();
+        nodes.sort((n1, n2) => (fn(n1) < fn(n2) ? -1 : 1));
 
         // find and populate the currently active root node
-        this.findRootNode(roots, this.nid);
-        this.loadPredictions(this.nid);
+        this.nodes = nodes;
+        this.findRootNodes(roots, this.nid);
+
+        this.roots = roots.filter((n) => n.nid !== this.node?.nid);
       });
-    },
-
-    loadPredictions(nid: number): void {
-      const limit = 500;
-
-      PredictionService.getPredictions(nid, 0, limit).then(
-        (preds: Predictions) => {
-          this.predictions = preds;
-        }
-      );
     },
 
     updatePredictionCounts() {
@@ -103,16 +129,18 @@ export default defineComponent({
       );
     },
 
-    findRootNode(roots: DeepNode[], nid: number): void {
+    findRootNodes(roots: DeepNode[], nid: number): void {
+      // find currently selected node
       for (const root of roots) {
         const node = this.findNode(root, nid);
 
         if (node) {
-          this.root = root;
           this.node = node;
           break;
         }
       }
+
+      // retain other roots
     },
 
     findNode(node: DeepNode, nid: number): DeepNode | null {
@@ -131,48 +159,26 @@ export default defineComponent({
       return null;
     },
 
-    findCollection(relation: string): Prediction[] {
-      if (!new Set(["synonym", "children", "parent"]).has(relation)) {
-        console.error("prediction-page.findCollection: unknown", relation);
-        return [];
-      }
+    // --- commonly used by event handlers
 
-      if (this.predictions === null) {
-        console.error("prediction-page.findCollection: no predictions");
-        return [];
-      }
+    removePredictions(pids: Set<number>, relation: string) {
+      console.log(`removing ${pids.size} prediction(s) from ${relation}`);
 
-      return relation === "synonym"
-        ? this.predictions.synonyms
-        : this.predictions.children;
+      const fn = (pred: Prediction) => !pids.has(pred.pid);
+
+      if (relation === "synonym") {
+        this.predictions.synonyms = this.predictions.synonyms.filter(fn);
+      } else {
+        this.predictions.children = this.predictions.children.filter(fn);
+      }
     },
 
-    dismiss(pred: Prediction, index: number, relation: string) {
-      console.log("dismiss", pred, index, relation);
-      if (this.predictions === null) return;
-      this.findCollection(relation).splice(index, 1);
+    // --- handling events
+
+    dismiss(pred: Prediction, relation: string) {
+      console.log("dismiss", pred, relation);
+      this.removePredictions(new Set([pred.pid]), relation);
       PredictionService.delPrediction(pred.pid);
-      this.updatePredictionCounts();
-    },
-
-    removePredictions(preds: Prediction[], pids: number[]) {
-      const removed = new Set(pids);
-
-      const indexes: number[] = [];
-      preds.forEach((pred, index) => {
-        if (removed.has(pred.pid)) indexes.push(index);
-      });
-
-      // backwards to retain previous indexes
-      while (indexes.length > 1) {
-        const tbd = indexes.pop();
-        // lol typescript
-        if (tbd) {
-          preds.splice(tbd, 1);
-          console.log("removing index", tbd);
-        }
-      }
-
       this.updatePredictionCounts();
     },
 
@@ -182,24 +188,25 @@ export default defineComponent({
       relation: string,
       callback: (removed: number) => void
     ) {
-      console.log("predictions-page: annotate", pred, annotation);
+      console.log("predictions-page: annotate", pred, annotation, relation);
 
       // response contains all to-be delete pids
       PredictionService.annPrediction(pred.pid, annotation).then((res) => {
-        // important: not annotated relation but the source list's one
-        const preds = this.findCollection(relation);
-        if (!preds) {
-          console.error("predictions-page annotate(): no predictions?");
-          return;
-        }
+        // remove cards from list
+        const removed = new Set(res.removed);
+        removed.delete(pred.pid);
+        this.removePredictions(removed, relation);
 
-        this.removePredictions(preds, res.removed);
+        // update state
+        this.loadNodes();
+        this.updatePredictionCounts();
         callback(res.removed.length);
       });
     },
 
-    close(index: number, relation: string) {
-      this.findCollection(relation).splice(index, 1);
+    close(pred: Prediction, relation: string) {
+      console.log("close", pred, relation);
+      this.removePredictions(new Set([pred.pid]), relation);
     },
 
     filter(
@@ -220,14 +227,9 @@ export default defineComponent({
         relation,
         phrase
       ).then((res) => {
-        // important: not annotated relation but the source list's one
-        const preds = this.findCollection(relation);
-        if (!preds) {
-          console.error("no predictions?");
-          return;
-        }
-
-        this.removePredictions(preds, res.removed);
+        const removed = new Set(res.removed);
+        removed.delete(pred.pid);
+        this.removePredictions(removed, relation);
         callback(res.removed.length);
       });
     },

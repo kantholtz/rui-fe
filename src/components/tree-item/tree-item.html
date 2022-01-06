@@ -35,8 +35,8 @@
 
   <ul v-if="expanded" class="py-2">
     <TreeItem
-      v-for="(child, index) in node.children"
-      :key="index"
+      v-for="(child, index) in sortedChildren"
+      :key="child.nid"
       :node="child"
       :selectedNode="selectedNode"
       :selectable="selectable"

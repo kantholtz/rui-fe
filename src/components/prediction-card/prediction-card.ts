@@ -76,6 +76,7 @@ export default defineComponent({
             tokenSelection ? tokens[index] : null
           )
           .filter((token) => token !== null)
+          .map((token) => token?.toLowerCase())
           .join(" ");
       },
     },

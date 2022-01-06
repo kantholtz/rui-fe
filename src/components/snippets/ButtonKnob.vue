@@ -50,6 +50,7 @@ export default defineComponent({
         grey: ["bg-gray-200", "text-gray-200"],
         sky: ["bg-sky-200", "text-white"],
         orange: ["bg-orange-100", "text-white"],
+        pink: ["bg-pink-300", "text-white"],
       };
 
       // --

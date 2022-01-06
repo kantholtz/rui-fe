@@ -31,6 +31,14 @@ export default defineComponent({
     expandable(): boolean {
       return this.node.children.length > 0;
     },
+    sortedChildren(): DeepNode[] {
+      const nodes = this.node.children.slice();
+
+      const fn = (n: DeepNode) => getNodeName(n).toLowerCase();
+      nodes.sort((n1, n2) => (fn(n1) < fn(n2) ? -1 : 1));
+
+      return nodes;
+    },
   },
 
   watch: {
