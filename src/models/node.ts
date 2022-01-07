@@ -12,6 +12,8 @@ export function getNodeName(node: Node): string {
 
 export interface DeepNode extends Node {
   children: DeepNode[];
+  childPredictions: number;
+  synoynmPredictions: number;
 }
 
 export interface NodePatch {

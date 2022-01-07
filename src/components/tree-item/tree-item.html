@@ -26,10 +26,20 @@
   />
 
   <!-- Node name -->
-
+  <!--
+  <template v-if="(node.synonymPredictions + node.childPredictions) > 0">
+    <span class="pr-2 text-orange-700">★</span>
+  </template>
+-->
   <a :class="getNodeClasses()" @click="selectable && $emit('select', node)">
     {{ getNodeName(node) }}
   </a>
+
+  <template v-if="(node.synonymPredictions + node.childPredictions) > 0">
+    <span class="pl-3 text-gray-400 text-sm"
+      >{{ node.synonymPredictions }}|{{ node.childPredictions }}</span
+    >
+  </template>
 
   <!-- Child nodes & Input new child node-->
 
