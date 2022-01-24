@@ -24,7 +24,7 @@ export interface Annotation {
   phrase: string;
   predictedNid: number;
   predictedRelation: string;
-  specific: boolean;
+  // specific: boolean;
 }
 
 export interface AnnotationResponse {

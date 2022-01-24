@@ -185,7 +185,7 @@ export default defineComponent({
     dismiss(pred: Prediction, relation: string) {
       console.log("dismiss", pred, relation);
       this.removePredictions(new Set([pred.pid]), relation);
-      PredictionService.delPrediction(pred.pid);
+      PredictionService.delPrediction(pred.pid, this.node?.nid || -1); // TODO
       this.updatePredictionCounts();
     },
 

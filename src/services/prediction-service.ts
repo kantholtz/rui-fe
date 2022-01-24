@@ -23,8 +23,8 @@ export const PredictionService = {
 
   // --
 
-  delPrediction(pid: number): Promise<Response | void> {
-    const url = `${process.env.VUE_APP_API_URL}/predictions/${pid}`;
+  delPrediction(pid: number, nid: number): Promise<Response | void> {
+    const url = `${process.env.VUE_APP_API_URL}/predictions/${pid}?nid=${nid}`;
 
     return fetch(url, {
       method: "DELETE",

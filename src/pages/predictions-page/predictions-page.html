@@ -37,7 +37,7 @@
 
       <template
         v-if="!isLoading"
-        v-for="prediction of predictions.synonyms"
+        v-for="prediction of predictions.synonyms.slice(0, 20)"
         :key="prediction.pid"
       >
         <PredictionCard
@@ -62,7 +62,7 @@
 
       <template
         v-if="!isLoading"
-        v-for="prediction of predictions.children"
+        v-for="prediction of predictions.children.slice(0, 20)"
         :key="prediction.pid"
       >
         <PredictionCard
